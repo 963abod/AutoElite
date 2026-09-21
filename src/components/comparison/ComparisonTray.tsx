@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Vehicle } from '@/types/vehicle';
+import { Language, TRANSLATIONS } from '@/data/translations';
 import { X, Layers } from 'lucide-react';
 
 interface ComparisonTrayProps {
@@ -9,6 +10,7 @@ interface ComparisonTrayProps {
   onRemoveVehicle: (id: string) => void;
   onClearAll: () => void;
   onCompareNow: () => void;
+  lang: Language;
 }
 
 export const ComparisonTray: React.FC<ComparisonTrayProps> = ({
@@ -16,22 +18,23 @@ export const ComparisonTray: React.FC<ComparisonTrayProps> = ({
   onRemoveVehicle,
   onClearAll,
   onCompareNow,
+  lang,
 }) => {
   if (vehicles.length === 0) return null;
 
+  const t = TRANSLATIONS[lang];
+
   return (
     <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-full max-w-2xl px-4 animate-in slide-in-from-bottom-8 duration-300">
-      <div className="bg-neutral-900 text-white rounded-full p-2.5 pl-6 shadow-2xl flex items-center justify-between gap-4 border border-neutral-800">
+      <div className="bg-neutral-900 text-white rounded-full p-2.5 px-6 shadow-2xl flex items-center justify-between gap-4 border border-neutral-800">
 
-        {/* Counter & Label */}
         <div className="flex items-center gap-3 shrink-0">
           <Layers className="w-4 h-4 text-neutral-400" />
           <span className="text-xs font-medium uppercase tracking-wider">
-            Comparing <span className="font-mono text-neutral-300">({vehicles.length}/3)</span>
+            {t.comparing} <span className="font-mono text-neutral-300">({vehicles.length}/3)</span>
           </span>
         </div>
 
-        {/* Vehicle Thumbnails */}
         <div className="flex items-center gap-2 overflow-x-auto py-0.5">
           {vehicles.map((v) => (
             <div
@@ -41,7 +44,7 @@ export const ComparisonTray: React.FC<ComparisonTrayProps> = ({
               <img src={v.image} alt={v.model} className="w-full h-full object-cover" />
               <button
                 onClick={() => onRemoveVehicle(v.id)}
-                aria-label={`Remove ${v.model} from comparison`}
+                aria-label={`Remove ${v.model}`}
                 className="absolute inset-0 bg-neutral-900/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
@@ -50,20 +53,19 @@ export const ComparisonTray: React.FC<ComparisonTrayProps> = ({
           ))}
         </div>
 
-        {/* CTA Actions */}
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onClearAll}
             className="text-[11px] uppercase tracking-wider text-neutral-400 hover:text-white transition-colors px-2 cursor-pointer"
           >
-            Clear
+            {t.clear}
           </button>
 
           <button
             onClick={onCompareNow}
             className="px-5 py-2 rounded-full bg-white text-neutral-900 hover:bg-neutral-100 text-xs font-medium uppercase tracking-wider transition-all cursor-pointer"
           >
-            Compare Matrix
+            {t.compareMatrix}
           </button>
         </div>
 

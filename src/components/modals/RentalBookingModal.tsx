@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { Vehicle } from '@/types/vehicle';
 import { RENTAL_ADDONS } from '@/data/vehicles';
-import { X, Check, ArrowRight, Shield } from 'lucide-react';
+import { Language, TRANSLATIONS } from '@/data/translations';
+import { X, Check, Shield } from 'lucide-react';
 
 interface RentalBookingModalProps {
   vehicle: Vehicle | null;
@@ -12,6 +13,7 @@ interface RentalBookingModalProps {
   location: string;
   onClose: () => void;
   onConfirmBooking: () => void;
+  lang: Language;
 }
 
 export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
@@ -21,9 +23,11 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
   location,
   onClose,
   onConfirmBooking,
+  lang,
 }) => {
   if (!vehicle) return null;
 
+  const t = TRANSLATIONS[lang];
   const [selectedAddons, setSelectedAddons] = useState<string[]>(['comprehensive-insurance']);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -65,11 +69,10 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
 
       <div className="relative w-full max-w-xl bg-[#F8F9FA] border border-neutral-200 rounded-3xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col">
 
-        {/* Modal Header */}
         <div className="px-8 py-6 border-b border-neutral-200/80 bg-white flex items-center justify-between sticky top-0 z-20">
           <div>
             <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">
-              Fleet Reservation
+              {t.fleetReservation}
             </span>
             <h2 className="text-lg font-normal text-neutral-900 tracking-tight">
               {vehicle.make} {vehicle.model}
@@ -77,7 +80,7 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            aria-label="Close rental booking modal"
+            aria-label="Close modal"
             className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
@@ -85,21 +88,18 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
         </div>
 
         {isSuccess ? (
-          /* Confirmation Screen */
           <div className="p-12 text-center space-y-4 my-auto">
             <div className="w-12 h-12 rounded-full bg-neutral-900 text-white flex items-center justify-center mx-auto">
               <Check className="w-5 h-5" />
             </div>
-            <h3 className="text-xl font-normal text-neutral-900 tracking-tight">Reservation Confirmed</h3>
+            <h3 className="text-xl font-normal text-neutral-900 tracking-tight">{t.reservationConfirmed}</h3>
             <p className="text-xs text-neutral-500 font-light max-w-md mx-auto leading-relaxed">
-              Your reservation for <span className="text-neutral-900 font-medium">{vehicle.make} {vehicle.model}</span> at <span className="text-neutral-900 font-medium">{location || vehicle.location}</span> is recorded. Direct concierge dispatch instructions have been issued.
+              {t.confirmedDesc}
             </p>
           </div>
         ) : (
-          /* Booking Form */
           <form onSubmit={handleSubmit} className="p-8 space-y-6 overflow-y-auto flex-1">
 
-            {/* Vehicle Summary */}
             <div className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-neutral-200/80">
               <div className="w-20 h-14 rounded-lg overflow-hidden bg-neutral-100 shrink-0">
                 <img src={vehicle.image} alt={vehicle.model} className="w-full h-full object-cover" />
@@ -107,26 +107,24 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
               <div className="space-y-0.5">
                 <h4 className="text-sm font-medium text-neutral-900">{vehicle.make} {vehicle.model}</h4>
                 <div className="text-[11px] text-neutral-400 font-light">
-                  {location || vehicle.location} · {days} {days === 1 ? 'Day' : 'Days'}
+                  {location || vehicle.location} · {days} {days === 1 ? t.day : t.days}
                 </div>
               </div>
             </div>
 
-            {/* Selected Dates */}
             <div className="grid grid-cols-2 gap-4 bg-white p-4 rounded-2xl border border-neutral-200/80 text-xs">
               <div>
-                <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block mb-1">Pickup</span>
+                <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block mb-1">{t.pickup}</span>
                 <span className="text-neutral-900 font-medium">{pickupDate || '2024-10-15'}</span>
               </div>
               <div>
-                <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block mb-1">Return</span>
+                <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block mb-1">{t.return}</span>
                 <span className="text-neutral-900 font-medium">{returnDate || '2024-10-18'}</span>
               </div>
             </div>
 
-            {/* Tailored Protection Addons */}
             <div className="space-y-3">
-              <h4 className="text-[11px] uppercase tracking-widest text-neutral-400 font-medium">Bespoke Coverage & Add-ons</h4>
+              <h4 className="text-[11px] uppercase tracking-widest text-neutral-400 font-medium">{t.bespokeAddons}</h4>
               <div className="space-y-2">
                 {RENTAL_ADDONS.map((addon) => {
                   const isChecked = selectedAddons.includes(addon.id);
@@ -162,31 +160,29 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
               </div>
             </div>
 
-            {/* Transparent Fare Breakdown */}
             <div className="p-5 rounded-2xl bg-white border border-neutral-200/80 space-y-2 text-xs">
               <div className="flex justify-between text-neutral-600 font-light">
-                <span>Fleet Rate (${vehicle.rentalPricePerDay}/day × {days} days)</span>
+                <span>{t.rate} (${vehicle.rentalPricePerDay} × {days})</span>
                 <span className="font-mono text-neutral-900">${baseFare}</span>
               </div>
               {addonsTotal > 0 && (
                 <div className="flex justify-between text-neutral-600 font-light">
-                  <span>Selected Options</span>
+                  <span>{t.bespokeAddons}</span>
                   <span className="font-mono text-neutral-900">${addonsTotal}</span>
                 </div>
               )}
               <div className="border-t border-neutral-100 pt-3 flex justify-between items-center text-sm font-medium text-neutral-900">
-                <span>Total Rate</span>
+                <span>{t.totalRate}</span>
                 <span className="text-lg font-mono text-neutral-900">${grandTotal}</span>
               </div>
             </div>
 
-            {/* Submit Action */}
             <button
               type="submit"
               className="w-full py-3.5 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white font-medium text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2"
             >
               <Shield className="w-3.5 h-3.5" />
-              <span>Confirm Reservation</span>
+              <span>{t.confirmReservation}</span>
             </button>
 
           </form>

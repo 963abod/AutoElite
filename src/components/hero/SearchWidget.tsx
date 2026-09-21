@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { PlatformMode, SearchFilterState } from '@/types/vehicle';
+import { Language, TRANSLATIONS } from '@/data/translations';
 import { AVAILABLE_LOCATIONS } from '@/data/vehicles';
 import { Search, ChevronDown } from 'lucide-react';
 
@@ -10,6 +11,7 @@ interface SearchWidgetProps {
   filters: SearchFilterState;
   onFilterChange: (filters: Partial<SearchFilterState>) => void;
   onSearchSubmit: () => void;
+  lang: Language;
 }
 
 export const SearchWidget: React.FC<SearchWidgetProps> = ({
@@ -17,7 +19,10 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
   filters,
   onFilterChange,
   onSearchSubmit,
+  lang,
 }) => {
+  const t = TRANSLATIONS[lang];
+
   const calculateDays = () => {
     if (!filters.pickupDate || !filters.returnDate) return 1;
     const start = new Date(filters.pickupDate);
@@ -39,35 +44,35 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
         className="w-full"
       >
         {mode === 'rent' ? (
-          /* RENTAL HORIZONTAL FILTER STRIP */
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-neutral-100">
+          /* RENTAL FILTER STRIP */
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-0 divide-y md:divide-y-0 md:divide-x md:rtl:divide-x-reverse divide-neutral-100">
 
             {/* Showroom Hub Select */}
-            <div className="flex-1 px-4 sm:px-6 py-2 text-left">
+            <div className="flex-1 px-4 sm:px-6 py-2 text-start">
               <label className="block text-[10px] uppercase tracking-widest text-neutral-400 font-medium mb-1">
-                Showroom Hub
+                {t.showroomHub}
               </label>
               <div className="relative flex items-center">
                 <select
                   value={filters.location}
                   onChange={(e) => onFilterChange({ location: e.target.value })}
-                  className="w-full bg-transparent text-xs font-medium text-neutral-900 focus:outline-none cursor-pointer appearance-none pr-6"
+                  className="w-full bg-transparent text-xs font-medium text-neutral-900 focus:outline-none cursor-pointer appearance-none pe-6"
                 >
-                  <option value="All Locations">All Showroom Hubs</option>
+                  <option value="All Locations">{t.allShowrooms}</option>
                   {AVAILABLE_LOCATIONS.map((loc) => (
                     <option key={loc} value={loc}>
                       {loc}
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute right-0 pointer-events-none" />
+                <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute ltr:right-0 rtl:left-0 pointer-events-none" />
               </div>
             </div>
 
             {/* Pickup Date */}
-            <div className="flex-1 px-4 sm:px-6 py-2 text-left">
+            <div className="flex-1 px-4 sm:px-6 py-2 text-start">
               <label className="block text-[10px] uppercase tracking-widest text-neutral-400 font-medium mb-1">
-                Pickup Date
+                {t.pickupDate}
               </label>
               <input
                 type="date"
@@ -78,13 +83,13 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
             </div>
 
             {/* Return Date */}
-            <div className="flex-1 px-4 sm:px-6 py-2 text-left">
+            <div className="flex-1 px-4 sm:px-6 py-2 text-start">
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-[10px] uppercase tracking-widest text-neutral-400 font-medium">
-                  Return Date
+                  {t.returnDate}
                 </label>
                 <span className="text-[10px] font-mono text-neutral-400">
-                  {rentalDays} {rentalDays === 1 ? 'Day' : 'Days'}
+                  {rentalDays} {rentalDays === 1 ? t.day : t.days}
                 </span>
               </div>
               <input
@@ -102,41 +107,41 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
                 className="w-full md:w-auto px-7 py-3 bg-neutral-900 hover:bg-neutral-800 text-white rounded-full text-xs font-medium uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shrink-0"
               >
                 <Search className="w-3.5 h-3.5" />
-                <span>Explore Fleet</span>
+                <span>{t.exploreFleet}</span>
               </button>
             </div>
 
           </div>
         ) : (
-          /* PRIVATE SALES HORIZONTAL FILTER STRIP */
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-neutral-100">
+          /* PRIVATE SALES FILTER STRIP */
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-0 divide-y md:divide-y-0 md:divide-x md:rtl:divide-x-reverse divide-neutral-100">
 
             {/* Body Style */}
-            <div className="flex-1 px-4 sm:px-6 py-2 text-left">
+            <div className="flex-1 px-4 sm:px-6 py-2 text-start">
               <label className="block text-[10px] uppercase tracking-widest text-neutral-400 font-medium mb-1">
-                Curated Category
+                {t.curatedCategory}
               </label>
               <div className="relative flex items-center">
                 <select
                   value={filters.bodyType}
                   onChange={(e) => onFilterChange({ bodyType: e.target.value })}
-                  className="w-full bg-transparent text-xs font-medium text-neutral-900 focus:outline-none cursor-pointer appearance-none pr-6"
+                  className="w-full bg-transparent text-xs font-medium text-neutral-900 focus:outline-none cursor-pointer appearance-none pe-6"
                 >
-                  <option value="All">All Categories</option>
-                  <option value="EV">Electric (EV)</option>
-                  <option value="SUV">Executive SUV</option>
-                  <option value="Coupe">Coupé</option>
-                  <option value="Sports Car">Sports Car</option>
+                  <option value="All">{t.allModels}</option>
+                  <option value="EV">{t.electricEV}</option>
+                  <option value="SUV">{t.executiveSUV}</option>
+                  <option value="Coupe">{t.coupe}</option>
+                  <option value="Sports Car">{t.sportsCar}</option>
                 </select>
-                <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute right-0 pointer-events-none" />
+                <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute ltr:right-0 rtl:left-0 pointer-events-none" />
               </div>
             </div>
 
             {/* Max Price Slider */}
-            <div className="flex-1 px-4 sm:px-6 py-2 text-left">
+            <div className="flex-1 px-4 sm:px-6 py-2 text-start">
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-[10px] uppercase tracking-widest text-neutral-400 font-medium">
-                  Maximum Budget
+                  {t.maxBudget}
                 </label>
                 <span className="text-[10px] font-mono font-medium text-neutral-900">
                   ${filters.priceRange[1].toLocaleString()}
@@ -156,21 +161,21 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
             </div>
 
             {/* Minimum Year */}
-            <div className="flex-1 px-4 sm:px-6 py-2 text-left">
+            <div className="flex-1 px-4 sm:px-6 py-2 text-start">
               <label className="block text-[10px] uppercase tracking-widest text-neutral-400 font-medium mb-1">
-                Model Year
+                {t.modelYear}
               </label>
               <div className="relative flex items-center">
                 <select
                   value={filters.yearRange[0]}
                   onChange={(e) => onFilterChange({ yearRange: [Number(e.target.value), 2024] })}
-                  className="w-full bg-transparent text-xs font-medium text-neutral-900 focus:outline-none cursor-pointer appearance-none pr-6"
+                  className="w-full bg-transparent text-xs font-medium text-neutral-900 focus:outline-none cursor-pointer appearance-none pe-6"
                 >
-                  <option value={2022}>2022 & Newer</option>
-                  <option value={2023}>2023 & Newer</option>
-                  <option value={2024}>2024 Current Generation</option>
+                  <option value={2022}>2022 {t.newer}</option>
+                  <option value={2023}>2023 {t.newer}</option>
+                  <option value={2024}>{t.currentGen}</option>
                 </select>
-                <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute right-0 pointer-events-none" />
+                <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute ltr:right-0 rtl:left-0 pointer-events-none" />
               </div>
             </div>
 
@@ -181,7 +186,7 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
                 className="w-full md:w-auto px-7 py-3 bg-neutral-900 hover:bg-neutral-800 text-white rounded-full text-xs font-medium uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shrink-0"
               >
                 <Search className="w-3.5 h-3.5" />
-                <span>Filter Inventory</span>
+                <span>{t.filterInventory}</span>
               </button>
             </div>
 

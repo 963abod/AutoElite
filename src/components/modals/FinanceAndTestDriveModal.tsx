@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Vehicle } from '@/types/vehicle';
+import { Language, TRANSLATIONS } from '@/data/translations';
 import { AVAILABLE_LOCATIONS } from '@/data/vehicles';
 import { X, Check } from 'lucide-react';
 
@@ -9,23 +10,24 @@ interface FinanceAndTestDriveModalProps {
   vehicle: Vehicle | null;
   onClose: () => void;
   onSuccess: () => void;
+  lang: Language;
 }
 
 export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> = ({
   vehicle,
   onClose,
   onSuccess,
+  lang,
 }) => {
   if (!vehicle) return null;
 
+  const t = TRANSLATIONS[lang];
   const [activeTab, setActiveTab] = useState<'finance' | 'test-drive'>('finance');
 
-  // Calculator States
   const [downPayment, setDownPayment] = useState<number>(Math.round(vehicle.purchasePrice * 0.2));
   const [loanTermMonths, setLoanTermMonths] = useState<number>(60);
   const [interestRate, setInterestRate] = useState<number>(4.5);
 
-  // Test Drive Form States
   const [testDriveDate, setTestDriveDate] = useState<string>('2024-10-20');
   const [timeSlot, setTimeSlot] = useState<string>('14:00 PM');
   const [showroomBranch, setShowroomBranch] = useState<string>(vehicle.location);
@@ -33,7 +35,6 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
   const [phone, setPhone] = useState<string>('');
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
-  // Loan Calculation
   const principal = Math.max(0, vehicle.purchasePrice - downPayment);
   const monthlyInterestRate = interestRate / 100 / 12;
   const monthlyPayment =
@@ -55,12 +56,11 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
 
       <div className="relative w-full max-w-xl bg-[#F8F9FA] border border-neutral-200 rounded-3xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col">
 
-        {/* Modal Header & Navigation */}
         <div className="px-8 py-6 border-b border-neutral-200/80 bg-white sticky top-0 z-20 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">
-                Private Sales Inquiry
+                {t.privateSalesInquiry}
               </span>
               <h2 className="text-lg font-normal text-neutral-900 tracking-tight">
                 {vehicle.make} {vehicle.model}
@@ -68,14 +68,13 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
             </div>
             <button
               onClick={onClose}
-              aria-label="Close finance and test drive modal"
+              aria-label="Close modal"
               className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Tab Control */}
           <div className="grid grid-cols-2 gap-2 bg-neutral-100 p-1 rounded-full border border-neutral-200/80">
             <button
               onClick={() => setActiveTab('finance')}
@@ -85,7 +84,7 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
                   : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
-              Loan Estimator
+              {t.loanEstimator}
             </button>
 
             <button
@@ -96,45 +95,40 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
                   : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
-              Book Test Drive
+              {t.bookTestDrive}
             </button>
           </div>
         </div>
 
         {isSuccess ? (
-          /* Confirmation Screen */
           <div className="p-12 text-center space-y-4 my-auto">
             <div className="w-12 h-12 rounded-full bg-neutral-900 text-white flex items-center justify-center mx-auto">
               <Check className="w-5 h-5" />
             </div>
-            <h3 className="text-xl font-normal text-neutral-900 tracking-tight">VIP Slot Reserved</h3>
+            <h3 className="text-xl font-normal text-neutral-900 tracking-tight">{t.vipSlotReserved}</h3>
             <p className="text-xs text-neutral-500 font-light max-w-md mx-auto leading-relaxed">
-              Your test drive for <span className="text-neutral-900 font-medium">{vehicle.make} {vehicle.model}</span> at <span className="text-neutral-900 font-medium">{showroomBranch}</span> on <span className="text-neutral-900 font-mono">{testDriveDate}</span> ({timeSlot}) is scheduled.
+              {t.vipReservedDesc}
             </p>
           </div>
         ) : activeTab === 'finance' ? (
-          /* FINANCE TAB */
           <div className="p-8 space-y-6 overflow-y-auto flex-1">
 
-            {/* Price & Monthly Summary */}
             <div className="p-5 rounded-2xl bg-white border border-neutral-200/80 flex items-center justify-between">
               <div>
-                <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Purchase Price</span>
+                <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">{t.purchasePrice}</span>
                 <div className="text-xl font-medium text-neutral-900 tracking-tight">${vehicle.purchasePrice.toLocaleString()}</div>
               </div>
-              <div className="text-right">
-                <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Est. Monthly</span>
-                <div className="text-xl font-mono text-neutral-900">${Math.round(monthlyPayment).toLocaleString()} / mo</div>
+              <div className="text-[end]">
+                <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">{t.estMonthly}</span>
+                <div className="text-xl font-mono text-neutral-900">${Math.round(monthlyPayment).toLocaleString()} / {t.months}</div>
               </div>
             </div>
 
-            {/* Controls */}
             <div className="space-y-5 bg-white p-6 rounded-2xl border border-neutral-200/80">
 
-              {/* Down Payment */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
-                  <span className="text-neutral-500 font-light">Down Payment</span>
+                  <span className="text-neutral-500 font-light">{t.downPayment}</span>
                   <span className="text-neutral-900 font-mono">${downPayment.toLocaleString()} ({Math.round((downPayment / vehicle.purchasePrice) * 100)}%)</span>
                 </div>
                 <input
@@ -148,9 +142,8 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
                 />
               </div>
 
-              {/* Loan Term Selection */}
               <div className="space-y-2">
-                <span className="text-xs text-neutral-500 font-light block">Term Length</span>
+                <span className="text-xs text-neutral-500 font-light block">{t.termLength}</span>
                 <div className="grid grid-cols-4 gap-2">
                   {[24, 36, 48, 60].map((term) => (
                     <button
@@ -163,16 +156,15 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
                           : 'bg-neutral-100 text-neutral-600 hover:text-neutral-900'
                       }`}
                     >
-                      {term} Mo
+                      {term} {t.months}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* APR Rate Slider */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
-                  <span className="text-neutral-500 font-light">APR Interest Rate</span>
+                  <span className="text-neutral-500 font-light">{t.aprRate}</span>
                   <span className="text-neutral-900 font-mono">{interestRate}%</span>
                 </div>
                 <input
@@ -192,16 +184,15 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
               onClick={() => setActiveTab('test-drive')}
               className="w-full py-3.5 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-medium uppercase tracking-wider transition-all cursor-pointer"
             >
-              Proceed to Book Test Drive
+              {t.proceedToTestDrive}
             </button>
 
           </div>
         ) : (
-          /* TEST DRIVE FORM */
           <form onSubmit={handleTestDriveSubmit} className="p-8 space-y-4 overflow-y-auto flex-1">
 
             <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Full Name</label>
+              <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">{t.fullName}</label>
               <input
                 type="text"
                 required
@@ -213,7 +204,7 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
             </div>
 
             <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Phone Contact</label>
+              <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">{t.phoneContact}</label>
               <input
                 type="tel"
                 required
@@ -227,7 +218,7 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
               <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Showroom Hub</label>
+                <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">{t.showroomHub}</label>
                 <select
                   value={showroomBranch}
                   onChange={(e) => setShowroomBranch(e.target.value)}
@@ -242,7 +233,7 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Preferred Date</label>
+                <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">{t.preferredDate}</label>
                 <input
                   type="date"
                   required
@@ -255,15 +246,15 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
             </div>
 
             <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Time Slot</label>
+              <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">{t.timeSlot}</label>
               <select
                 value={timeSlot}
                 onChange={(e) => setTimeSlot(e.target.value)}
                 className="w-full bg-white border border-neutral-200/80 rounded-xl px-4 py-3 text-xs text-neutral-900 focus:outline-none focus:border-neutral-900"
               >
-                <option value="10:00 AM">10:00 AM Morning Appointment</option>
-                <option value="14:00 PM">14:00 PM Afternoon Appointment</option>
-                <option value="17:00 PM">17:00 PM Private Sunset Drive</option>
+                <option value="10:00 AM">10:00 AM</option>
+                <option value="14:00 PM">14:00 PM</option>
+                <option value="17:00 PM">17:00 PM</option>
               </select>
             </div>
 
@@ -271,7 +262,7 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
               type="submit"
               className="w-full py-3.5 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-medium uppercase tracking-wider transition-all cursor-pointer mt-4"
             >
-              Schedule VIP Test Drive
+              {t.scheduleTestDrive}
             </button>
 
           </form>

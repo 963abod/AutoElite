@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { PlatformMode, SearchFilterState, Vehicle } from '@/types/vehicle';
+import { Language } from '@/data/translations';
 import { MOCK_VEHICLES } from '@/data/vehicles';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -12,6 +13,7 @@ import { ComparisonTray } from '@/components/comparison/ComparisonTray';
 import { ComparisonModal } from '@/components/comparison/ComparisonModal';
 import { RentalBookingModal } from '@/components/modals/RentalBookingModal';
 import { FinanceAndTestDriveModal } from '@/components/modals/FinanceAndTestDriveModal';
+
 const DEFAULT_FILTERS: SearchFilterState = {
   mode: 'rent',
   searchQuery: '',
@@ -28,6 +30,7 @@ const DEFAULT_FILTERS: SearchFilterState = {
 };
 
 export default function AutoElitePlatform() {
+  const [lang, setLang] = useState<Language>('ar'); // Official Language: Arabic
   const [mode, setMode] = useState<PlatformMode>('rent');
   const [selectedLocation, setSelectedLocation] = useState<string>('All Locations');
   const [filters, setFilters] = useState<SearchFilterState>(DEFAULT_FILTERS);
@@ -62,7 +65,7 @@ export default function AutoElitePlatform() {
       if (exists) {
         return prev.filter((v) => v.id !== vehicle.id);
       } else {
-        if (prev.length >= 3) return prev; // Limit to 3 cars
+        if (prev.length >= 3) return prev;
         return [...prev, vehicle];
       }
     });
@@ -76,7 +79,6 @@ export default function AutoElitePlatform() {
     setComparedVehicles([]);
   };
 
-  // Primary Action Trigger (Reserve or Test Drive)
   const handlePrimaryVehicleAction = (vehicle: Vehicle) => {
     if (mode === 'rent') {
       setRentalModalVehicle(vehicle);
@@ -88,7 +90,6 @@ export default function AutoElitePlatform() {
   // Dynamic Filtering Logic
   const filteredVehicles = useMemo(() => {
     return MOCK_VEHICLES.filter((v) => {
-      // Search query filter
       if (
         filters.searchQuery &&
         !`${v.make} ${v.model} ${v.trim}`.toLowerCase().includes(filters.searchQuery.toLowerCase())
@@ -96,12 +97,10 @@ export default function AutoElitePlatform() {
         return false;
       }
 
-      // Body Type filter
       if (filters.bodyType !== 'All' && v.bodyType !== filters.bodyType) {
         return false;
       }
 
-      // Location filter
       if (
         selectedLocation !== 'All Locations' &&
         filters.location !== 'All Locations' &&
@@ -111,18 +110,12 @@ export default function AutoElitePlatform() {
         return false;
       }
 
-      // Price filter based on Mode
-      if (mode === 'rent') {
-        if (v.rentalPricePerDay > filters.priceRange[1] && filters.priceRange[1] < 300000) {
-          // If range slider was adjusted in buy mode, don't overly restrict rent unless explicitly adjusted
-        }
-      } else {
+      if (mode === 'buy') {
         if (v.purchasePrice > filters.priceRange[1]) {
           return false;
         }
       }
 
-      // Year range filter
       if (v.year < filters.yearRange[0]) {
         return false;
       }
@@ -142,10 +135,7 @@ export default function AutoElitePlatform() {
       if (filters.sortBy === 'year-desc') {
         return b.year - a.year;
       }
-      if (filters.sortBy === 'rating') {
-        return b.rating - a.rating;
-      }
-      return 0; // featured default
+      return 0;
     });
   }, [mode, filters, selectedLocation]);
 
@@ -157,7 +147,10 @@ export default function AutoElitePlatform() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA] text-slate-900 font-sans selection:bg-slate-900 selection:text-white">
+    <div
+      dir={lang === 'ar' ? 'rtl' : 'ltr'}
+      className="min-h-screen flex flex-col bg-[#F8F9FA] text-neutral-900 font-sans selection:bg-neutral-900 selection:text-white"
+    >
 
       {/* Top Navbar Header */}
       <Navbar
@@ -167,18 +160,21 @@ export default function AutoElitePlatform() {
         onLocationChange={setSelectedLocation}
         comparedCount={comparedVehicles.length}
         onOpenCompare={() => setIsCompareModalOpen(true)}
+        lang={lang}
+        onLanguageChange={setLang}
       />
 
       {/* Main Page Body */}
       <main className="flex-1">
 
-        {/* Hero Banner with Switcher & Search Bar */}
+        {/* Hero Banner */}
         <Hero
           mode={mode}
           onModeChange={handleModeChange}
           filters={filters}
           onFilterChange={handleFilterChange}
           onSearchSubmit={handleScrollToGrid}
+          lang={lang}
         />
 
         {/* Live Inventory Grid */}
@@ -192,12 +188,13 @@ export default function AutoElitePlatform() {
           onToggleCompare={handleToggleCompare}
           onSelectVehicle={(v) => setSelectedVehicleForDetails(v)}
           onPrimaryAction={handlePrimaryVehicleAction}
+          lang={lang}
         />
 
       </main>
 
       {/* Footer */}
-      <Footer />
+      <Footer lang={lang} />
 
       {/* Comparison Bottom Floating Tray */}
       <ComparisonTray
@@ -205,6 +202,7 @@ export default function AutoElitePlatform() {
         onRemoveVehicle={handleRemoveCompare}
         onClearAll={handleClearCompare}
         onCompareNow={() => setIsCompareModalOpen(true)}
+        lang={lang}
       />
 
       {/* Comparison Modal */}
@@ -215,6 +213,7 @@ export default function AutoElitePlatform() {
           onClose={() => setIsCompareModalOpen(false)}
           onSelectVehicleForAction={handlePrimaryVehicleAction}
           onRemoveVehicle={handleRemoveCompare}
+          lang={lang}
         />
       )}
 
@@ -225,10 +224,11 @@ export default function AutoElitePlatform() {
           mode={mode}
           onClose={() => setSelectedVehicleForDetails(null)}
           onBookNow={handlePrimaryVehicleAction}
+          lang={lang}
         />
       )}
 
-      {/* Rental Reservation Drawer / Modal */}
+      {/* Rental Reservation Modal */}
       {rentalModalVehicle && (
         <RentalBookingModal
           vehicle={rentalModalVehicle}
@@ -237,15 +237,17 @@ export default function AutoElitePlatform() {
           location={selectedLocation !== 'All Locations' ? selectedLocation : filters.location}
           onClose={() => setRentalModalVehicle(null)}
           onConfirmBooking={() => setRentalModalVehicle(null)}
+          lang={lang}
         />
       )}
 
-      {/* Sales Finance & Test Drive Drawer / Modal */}
+      {/* Sales Finance & Test Drive Modal */}
       {salesModalVehicle && (
         <FinanceAndTestDriveModal
           vehicle={salesModalVehicle}
           onClose={() => setSalesModalVehicle(null)}
           onSuccess={() => setSalesModalVehicle(null)}
+          lang={lang}
         />
       )}
 

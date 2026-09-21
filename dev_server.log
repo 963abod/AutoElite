@@ -10,3 +10,4 @@
 
  HEAD / 200 in 3.3s (next.js: 3.0s, application-code: 364ms)
  GET / 200 in 111ms (next.js: 15ms, application-code: 96ms)
+ GET / 200 in 480ms (next.js: 68ms, application-code: 412ms)

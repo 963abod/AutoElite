@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { SearchFilterState } from '@/types/vehicle';
+import { Language, TRANSLATIONS } from '@/data/translations';
 import { Search, ChevronDown, RotateCcw } from 'lucide-react';
 
 interface QuickFiltersProps {
@@ -9,22 +10,26 @@ interface QuickFiltersProps {
   onFilterChange: (filters: Partial<SearchFilterState>) => void;
   onResetFilters: () => void;
   totalResults: number;
+  lang: Language;
 }
-
-const BODY_TYPES: { label: string; value: string }[] = [
-  { label: 'All Models', value: 'All' },
-  { label: 'Electric (EV)', value: 'EV' },
-  { label: 'Executive SUV', value: 'SUV' },
-  { label: 'Coupé', value: 'Coupe' },
-  { label: 'Sports Car', value: 'Sports Car' }
-];
 
 export const QuickFilters: React.FC<QuickFiltersProps> = ({
   filters,
   onFilterChange,
   onResetFilters,
   totalResults,
+  lang,
 }) => {
+  const t = TRANSLATIONS[lang];
+
+  const bodyTypes = [
+    { label: t.allModels, value: 'All' },
+    { label: t.electricEV, value: 'EV' },
+    { label: t.executiveSUV, value: 'SUV' },
+    { label: t.coupe, value: 'Coupe' },
+    { label: t.sportsCar, value: 'Sports Car' }
+  ];
+
   return (
     <div className="space-y-6 mb-12">
 
@@ -33,7 +38,7 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
 
         {/* Minimalist Category Buttons */}
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-2 lg:pb-0">
-          {BODY_TYPES.map((bt) => (
+          {bodyTypes.map((bt) => (
             <button
               key={bt.value}
               onClick={() => onFilterChange({ bodyType: bt.value })}
@@ -53,13 +58,13 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
 
           {/* Quick Search Box */}
           <div className="relative flex-1 sm:w-60">
-            <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-neutral-400 absolute ltr:left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Filter model..."
+              placeholder={t.filterModel}
               value={filters.searchQuery}
               onChange={(e) => onFilterChange({ searchQuery: e.target.value })}
-              className="w-full bg-white border border-neutral-200/80 rounded-full pl-9 pr-4 py-2 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900"
+              className="w-full bg-white border border-neutral-200/80 rounded-full ltr:pl-9 ltr:pr-4 rtl:pr-9 rtl:pl-4 py-2 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900"
             />
           </div>
 
@@ -68,14 +73,14 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
             <select
               value={filters.sortBy}
               onChange={(e) => onFilterChange({ sortBy: e.target.value as any })}
-              className="bg-transparent focus:outline-none cursor-pointer pr-5 appearance-none text-xs"
+              className="bg-transparent focus:outline-none cursor-pointer pe-5 appearance-none text-xs"
             >
-              <option value="featured">Featured First</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="year-desc">Newest Generation</option>
+              <option value="featured">{t.featuredFirst}</option>
+              <option value="price-asc">{t.priceLowHigh}</option>
+              <option value="price-desc">{t.priceHighLow}</option>
+              <option value="year-desc">{t.newestGen}</option>
             </select>
-            <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute right-3 pointer-events-none" />
+            <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute ltr:right-3 rtl:left-3 pointer-events-none" />
           </div>
 
           {/* Reset Filters */}
@@ -92,13 +97,13 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
 
       </div>
 
-      {/* Quiet Results Counter */}
+      {/* Results Counter */}
       <div className="flex items-center justify-between text-[11px] uppercase tracking-widest text-neutral-400 font-medium">
         <div>
-          Showing <span className="text-neutral-900 font-bold">{totalResults}</span> Curated Vehicles
+          {t.showing} <span className="text-neutral-900 font-bold">{totalResults}</span> {t.curatedVehicles}
         </div>
         <div>
-          Portfolio Mode: <span className="text-neutral-900 font-semibold">{filters.mode === 'rent' ? 'Rental' : 'Sales'}</span>
+          {t.portfolioMode}: <span className="text-neutral-900 font-semibold">{filters.mode === 'rent' ? t.rental : t.sales}</span>
         </div>
       </div>
 
