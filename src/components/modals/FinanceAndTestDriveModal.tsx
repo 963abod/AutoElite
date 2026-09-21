@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Vehicle } from '@/types/vehicle';
 import { AVAILABLE_LOCATIONS } from '@/data/vehicles';
-import { X, Calculator, Calendar, MapPin, DollarSign, Clock, ShieldCheck, CheckCircle2, User, Phone, Mail } from 'lucide-react';
+import { X, Calculator, Calendar, MapPin, Clock, CheckCircle2, User, Phone } from 'lucide-react';
 
 interface FinanceAndTestDriveModalProps {
   vehicle: Vehicle | null;
@@ -54,34 +54,34 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
 
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col">
+      <div className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col">
 
         {/* Modal Header & Tab Toggle */}
-        <div className="p-6 border-b border-white/10 bg-slate-950/50 sticky top-0 z-20 backdrop-blur-md">
+        <div className="p-6 border-b border-slate-200 bg-slate-50 sticky top-0 z-20">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-lg font-bold text-white font-sans">{vehicle.make} {vehicle.model} ({vehicle.year})</h2>
-              <p className="text-xs text-gray-400">Sales Finance & Showroom Test Drive Hub</p>
+              <h2 className="text-lg font-bold text-slate-900 font-sans">{vehicle.make} {vehicle.model} ({vehicle.year})</h2>
+              <p className="text-xs text-slate-500">Sales Finance & Showroom Test Drive Hub</p>
             </div>
             <button
               onClick={onClose}
               aria-label="Close finance and test drive modal"
-              className="p-2 rounded-full bg-slate-800 hover:bg-slate-700 text-gray-400 hover:text-white transition-colors"
+              className="p-2 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Navigation Tabs */}
-          <div className="grid grid-cols-2 gap-2 bg-slate-950 p-1 rounded-xl border border-white/10">
+          <div className="grid grid-cols-2 gap-2 bg-slate-200/80 p-1 rounded-xl border border-slate-300/80">
             <button
               onClick={() => setActiveTab('finance')}
-              className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
+              className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
                 activeTab === 'finance'
-                  ? 'bg-amber-500 text-slate-950 shadow'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Calculator className="w-3.5 h-3.5" />
@@ -90,10 +90,10 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
 
             <button
               onClick={() => setActiveTab('test-drive')}
-              className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
+              className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
                 activeTab === 'test-drive'
-                  ? 'bg-amber-500 text-slate-950 shadow'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Calendar className="w-3.5 h-3.5" />
@@ -105,12 +105,12 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
         {isSuccess ? (
           /* Success Screen */
           <div className="p-12 text-center space-y-4 my-auto">
-            <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center mx-auto text-emerald-400">
+            <div className="w-20 h-20 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center mx-auto text-emerald-600">
               <CheckCircle2 className="w-10 h-10" />
             </div>
-            <h3 className="text-2xl font-bold text-white">VIP Slot Dispatched!</h3>
-            <p className="text-xs text-gray-300 max-w-md mx-auto">
-              Your test drive reservation for <span className="text-white font-semibold">{vehicle.make} {vehicle.model}</span> at <span className="text-amber-400">{showroomBranch}</span> on <span className="text-white font-mono">{testDriveDate}</span> ({timeSlot}) is scheduled.
+            <h3 className="text-2xl font-bold text-slate-900">VIP Slot Dispatched!</h3>
+            <p className="text-xs text-slate-600 max-w-md mx-auto">
+              Your test drive reservation for <span className="text-slate-900 font-semibold">{vehicle.make} {vehicle.model}</span> at <span className="text-slate-900 font-medium">{showroomBranch}</span> on <span className="text-slate-900 font-mono">{testDriveDate}</span> ({timeSlot}) is scheduled.
             </p>
           </div>
         ) : activeTab === 'finance' ? (
@@ -118,25 +118,25 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
           <div className="p-6 space-y-6 overflow-y-auto">
 
             {/* Purchase Price Summary */}
-            <div className="p-4 rounded-2xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
               <div>
-                <span className="text-xs text-gray-400 uppercase tracking-wider">Vehicle Listing Price</span>
-                <div className="text-2xl font-extrabold text-white font-mono">${vehicle.purchasePrice.toLocaleString()}</div>
+                <span className="text-xs text-slate-500 uppercase tracking-wider">Vehicle Listing Price</span>
+                <div className="text-2xl font-extrabold text-slate-900 font-mono">${vehicle.purchasePrice.toLocaleString()}</div>
               </div>
               <div className="text-right">
-                <span className="text-xs text-amber-400 uppercase tracking-wider font-semibold">Estimated Loan</span>
-                <div className="text-2xl font-extrabold text-amber-400 font-mono">${Math.round(monthlyPayment).toLocaleString()} / mo</div>
+                <span className="text-xs text-slate-600 uppercase tracking-wider font-semibold">Estimated Loan</span>
+                <div className="text-2xl font-extrabold text-slate-900 font-mono">${Math.round(monthlyPayment).toLocaleString()} / mo</div>
               </div>
             </div>
 
             {/* Slider Controls */}
-            <div className="space-y-5 bg-slate-950/40 p-5 rounded-2xl border border-white/5">
+            <div className="space-y-5 bg-slate-50 p-5 rounded-2xl border border-slate-200">
 
               {/* Down Payment Slider */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-semibold">
-                  <span className="text-gray-300">Down Payment</span>
-                  <span className="text-amber-400 font-mono">${downPayment.toLocaleString()} ({Math.round((downPayment / vehicle.purchasePrice) * 100)}%)</span>
+                  <span className="text-slate-700">Down Payment</span>
+                  <span className="text-slate-900 font-mono">${downPayment.toLocaleString()} ({Math.round((downPayment / vehicle.purchasePrice) * 100)}%)</span>
                 </div>
                 <input
                   type="range"
@@ -145,23 +145,23 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
                   step={1000}
                   value={downPayment}
                   onChange={(e) => setDownPayment(Number(e.target.value))}
-                  className="w-full accent-amber-500 cursor-pointer h-2 bg-slate-800 rounded-lg"
+                  className="w-full accent-slate-900 cursor-pointer h-2 bg-slate-200 rounded-lg"
                 />
               </div>
 
               {/* Loan Term Selection */}
               <div className="space-y-2">
-                <span className="text-xs font-semibold text-gray-300 block">Loan Duration (Months)</span>
+                <span className="text-xs font-semibold text-slate-700 block">Loan Duration (Months)</span>
                 <div className="grid grid-cols-4 gap-2">
                   {[24, 36, 48, 60].map((term) => (
                     <button
                       key={term}
                       type="button"
                       onClick={() => setLoanTermMonths(term)}
-                      className={`py-2 rounded-xl text-xs font-mono font-bold transition-all ${
+                      className={`py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
                         loanTermMonths === term
-                          ? 'bg-amber-500 text-slate-950 border border-amber-400'
-                          : 'bg-slate-900 text-gray-400 border border-white/10 hover:text-white'
+                          ? 'bg-slate-900 text-white shadow-xs'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:text-slate-900'
                       }`}
                     >
                       {term} Mo
@@ -173,8 +173,8 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
               {/* Interest Rate Slider */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-semibold">
-                  <span className="text-gray-300">Interest Rate (APR)</span>
-                  <span className="text-amber-400 font-mono">{interestRate}%</span>
+                  <span className="text-slate-700">Interest Rate (APR)</span>
+                  <span className="text-slate-900 font-mono">{interestRate}%</span>
                 </div>
                 <input
                   type="range"
@@ -183,27 +183,27 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
                   step={0.1}
                   value={interestRate}
                   onChange={(e) => setInterestRate(Number(e.target.value))}
-                  className="w-full accent-amber-500 cursor-pointer h-2 bg-slate-800 rounded-lg"
+                  className="w-full accent-slate-900 cursor-pointer h-2 bg-slate-200 rounded-lg"
                 />
               </div>
 
             </div>
 
             {/* Financial Summary */}
-            <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-950 border border-white/10 text-xs font-mono">
+            <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-mono">
               <div>
-                <span className="text-gray-400 block text-[10px] uppercase font-sans">Total Financed Amount</span>
-                <span className="text-white font-bold">${principal.toLocaleString()}</span>
+                <span className="text-slate-500 block text-[10px] uppercase font-sans">Total Financed Amount</span>
+                <span className="text-slate-900 font-bold">${principal.toLocaleString()}</span>
               </div>
               <div>
-                <span className="text-gray-400 block text-[10px] uppercase font-sans">Total Estimated Interest</span>
-                <span className="text-amber-400 font-bold">${Math.round(totalInterest).toLocaleString()}</span>
+                <span className="text-slate-500 block text-[10px] uppercase font-sans">Total Estimated Interest</span>
+                <span className="text-slate-900 font-bold">${Math.round(totalInterest).toLocaleString()}</span>
               </div>
             </div>
 
             <button
               onClick={() => setActiveTab('test-drive')}
-              className="w-full py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-xl shadow-amber-500/25 flex items-center justify-center gap-2 transition-all"
+              className="w-full py-3.5 rounded-2xl bg-[#0B192C] hover:bg-slate-800 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               <span>Apply Calculation & Book Test Drive</span>
             </button>
@@ -216,8 +216,8 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1">
-                  <User className="w-3.5 h-3.5 text-amber-400" /> Full Name
+                <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                  <User className="w-3.5 h-3.5 text-slate-500" /> Full Name
                 </label>
                 <input
                   type="text"
@@ -225,13 +225,13 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
                   placeholder="e.g. Lord Alexander Vance"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-slate-400"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1">
-                  <Phone className="w-3.5 h-3.5 text-amber-400" /> Phone Contact
+                <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                  <Phone className="w-3.5 h-3.5 text-slate-500" /> Phone Contact
                 </label>
                 <input
                   type="tel"
@@ -239,7 +239,7 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
                   placeholder="+1 (555) 019-2834"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-slate-400"
                 />
               </div>
 
@@ -248,13 +248,13 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-amber-400" /> Showroom
+                <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-slate-500" /> Showroom
                 </label>
                 <select
                   value={showroomBranch}
                   onChange={(e) => setShowroomBranch(e.target.value)}
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-slate-400"
                 >
                   {AVAILABLE_LOCATIONS.map((loc) => (
                     <option key={loc} value={loc}>
@@ -265,26 +265,26 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-amber-400" /> Preferred Date
+                <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-slate-500" /> Preferred Date
                 </label>
                 <input
                   type="date"
                   required
                   value={testDriveDate}
                   onChange={(e) => setTestDriveDate(e.target.value)}
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-slate-400"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-amber-400" /> Time Slot
+                <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-slate-500" /> Time Slot
                 </label>
                 <select
                   value={timeSlot}
                   onChange={(e) => setTimeSlot(e.target.value)}
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-slate-400"
                 >
                   <option value="10:00 AM">10:00 AM Morning</option>
                   <option value="14:00 PM">14:00 PM Afternoon</option>
@@ -296,7 +296,7 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
 
             <button
               type="submit"
-              className="w-full py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-xl shadow-amber-500/25 transition-all mt-4"
+              className="w-full py-3.5 rounded-2xl bg-[#0B192C] hover:bg-slate-800 text-white font-bold text-sm shadow-md transition-all mt-4 cursor-pointer"
             >
               Confirm Showroom VIP Test Drive
             </button>

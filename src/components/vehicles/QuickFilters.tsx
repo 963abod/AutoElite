@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { SearchFilterState, BodyType } from '@/types/vehicle';
-import { Search, SlidersHorizontal, ArrowUpDown, RefreshCcw } from 'lucide-react';
+import { SearchFilterState } from '@/types/vehicle';
+import { Search, ArrowUpDown, RefreshCcw } from 'lucide-react';
 
 interface QuickFiltersProps {
   filters: SearchFilterState;
@@ -37,10 +37,10 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
             <button
               key={bt.value}
               onClick={() => onFilterChange({ bodyType: bt.value })}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-300 ${
+              className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-300 cursor-pointer ${
                 filters.bodyType === bt.value
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20 border border-blue-400/30'
-                  : 'bg-slate-900/80 text-gray-400 hover:text-white border border-white/5 hover:border-white/10'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
               }`}
             >
               {bt.label}
@@ -53,36 +53,36 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
 
           {/* Quick Search */}
           <div className="relative flex-1 sm:w-64">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search make or model..."
               value={filters.searchQuery}
               onChange={(e) => onFilterChange({ searchQuery: e.target.value })}
-              className="w-full bg-slate-900/90 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+              className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-400 shadow-xs"
             />
           </div>
 
           {/* Sort By */}
-          <div className="flex items-center gap-2 bg-slate-900/90 border border-white/10 rounded-xl px-3 py-2 text-xs text-gray-300">
-            <ArrowUpDown className="w-3.5 h-3.5 text-blue-400" />
+          <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 shadow-xs">
+            <ArrowUpDown className="w-3.5 h-3.5 text-slate-500" />
             <select
               value={filters.sortBy}
               onChange={(e) => onFilterChange({ sortBy: e.target.value as any })}
-              className="bg-transparent text-gray-200 focus:outline-none cursor-pointer text-xs"
+              className="bg-transparent text-slate-800 focus:outline-none cursor-pointer text-xs font-medium"
             >
-              <option value="featured" className="bg-slate-900 text-gray-200">Featured First</option>
-              <option value="price-asc" className="bg-slate-900 text-gray-200">Price: Low to High</option>
-              <option value="price-desc" className="bg-slate-900 text-gray-200">Price: High to Low</option>
-              <option value="year-desc" className="bg-slate-900 text-gray-200">Newest Year</option>
-              <option value="rating" className="bg-slate-900 text-gray-200">Highest Rated</option>
+              <option value="featured" className="bg-white text-slate-800">Featured First</option>
+              <option value="price-asc" className="bg-white text-slate-800">Price: Low to High</option>
+              <option value="price-desc" className="bg-white text-slate-800">Price: High to Low</option>
+              <option value="year-desc" className="bg-white text-slate-800">Newest Year</option>
+              <option value="rating" className="bg-white text-slate-800">Highest Rated</option>
             </select>
           </div>
 
           {/* Reset Button */}
           <button
             onClick={onResetFilters}
-            className="p-2 rounded-xl bg-slate-900/90 border border-white/10 text-gray-400 hover:text-white transition-colors"
+            className="p-2 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-xs cursor-pointer"
             title="Reset Filters"
           >
             <RefreshCcw className="w-4 h-4" />
@@ -93,12 +93,12 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
       </div>
 
       {/* Results Count Banner */}
-      <div className="flex items-center justify-between text-xs text-gray-400 border-b border-white/5 pb-4">
+      <div className="flex items-center justify-between text-xs text-slate-500 border-b border-slate-200/80 pb-4">
         <div>
-          Showing <span className="text-white font-bold">{totalResults}</span> luxury vehicles matching criteria
+          Showing <span className="text-slate-900 font-bold">{totalResults}</span> luxury vehicles matching criteria
         </div>
-        <div className="text-[11px] font-mono text-gray-500">
-          Mode: <span className="text-blue-400 uppercase font-semibold">{filters.mode}</span>
+        <div className="text-[11px] font-mono text-slate-500">
+          Mode: <span className="text-slate-900 uppercase font-semibold">{filters.mode}</span>
         </div>
       </div>
 

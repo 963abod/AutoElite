@@ -159,7 +159,7 @@ export default function AutoElitePlatform() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#090d16] text-gray-100 font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA] text-slate-900 font-sans selection:bg-slate-900 selection:text-white">
 
       {/* Top Navbar Header */}
       <Navbar
