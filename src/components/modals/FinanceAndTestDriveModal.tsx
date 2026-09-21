@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Vehicle } from '@/types/vehicle';
 import { AVAILABLE_LOCATIONS } from '@/data/vehicles';
-import { X, Calculator, Calendar, MapPin, Clock, CheckCircle2, User, Phone } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 
 interface FinanceAndTestDriveModalProps {
   vehicle: Vehicle | null;
@@ -33,7 +33,7 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
   const [phone, setPhone] = useState<string>('');
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
-  // Loan Calculation Math
+  // Loan Calculation
   const principal = Math.max(0, vehicle.purchasePrice - downPayment);
   const monthlyInterestRate = interestRate / 100 / 12;
   const monthlyPayment =
@@ -41,9 +41,6 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
       ? (principal * (monthlyInterestRate * Math.pow(1 + monthlyInterestRate, loanTermMonths))) /
         (Math.pow(1 + monthlyInterestRate, loanTermMonths) - 1)
       : principal / loanTermMonths;
-
-  const totalCost = monthlyPayment * loanTermMonths + downPayment;
-  const totalInterest = Math.max(0, totalCost - vehicle.purchasePrice);
 
   const handleTestDriveSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,89 +51,91 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-neutral-900/40 backdrop-blur-xs animate-in fade-in duration-200">
 
-      <div className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col">
+      <div className="relative w-full max-w-xl bg-[#F8F9FA] border border-neutral-200 rounded-3xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col">
 
-        {/* Modal Header & Tab Toggle */}
-        <div className="p-6 border-b border-slate-200 bg-slate-50 sticky top-0 z-20">
-          <div className="flex items-center justify-between mb-4">
+        {/* Modal Header & Navigation */}
+        <div className="px-8 py-6 border-b border-neutral-200/80 bg-white sticky top-0 z-20 space-y-4">
+          <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-slate-900 font-sans">{vehicle.make} {vehicle.model} ({vehicle.year})</h2>
-              <p className="text-xs text-slate-500">Sales Finance & Showroom Test Drive Hub</p>
+              <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">
+                Private Sales Inquiry
+              </span>
+              <h2 className="text-lg font-normal text-neutral-900 tracking-tight">
+                {vehicle.make} {vehicle.model}
+              </h2>
             </div>
             <button
               onClick={onClose}
               aria-label="Close finance and test drive modal"
-              className="p-2 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+              className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 transition-colors cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Navigation Tabs */}
-          <div className="grid grid-cols-2 gap-2 bg-slate-200/80 p-1 rounded-xl border border-slate-300/80">
+          {/* Tab Control */}
+          <div className="grid grid-cols-2 gap-2 bg-neutral-100 p-1 rounded-full border border-neutral-200/80">
             <button
               onClick={() => setActiveTab('finance')}
-              className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              className={`py-2 text-xs font-medium uppercase tracking-wider rounded-full transition-all cursor-pointer ${
                 activeTab === 'finance'
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-neutral-900 text-white shadow-xs'
+                  : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
-              <Calculator className="w-3.5 h-3.5" />
-              <span>Auto Loan Calculator</span>
+              Loan Estimator
             </button>
 
             <button
               onClick={() => setActiveTab('test-drive')}
-              className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              className={`py-2 text-xs font-medium uppercase tracking-wider rounded-full transition-all cursor-pointer ${
                 activeTab === 'test-drive'
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-neutral-900 text-white shadow-xs'
+                  : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Book VIP Test Drive</span>
+              Book Test Drive
             </button>
           </div>
         </div>
 
         {isSuccess ? (
-          /* Success Screen */
+          /* Confirmation Screen */
           <div className="p-12 text-center space-y-4 my-auto">
-            <div className="w-20 h-20 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center mx-auto text-emerald-600">
-              <CheckCircle2 className="w-10 h-10" />
+            <div className="w-12 h-12 rounded-full bg-neutral-900 text-white flex items-center justify-center mx-auto">
+              <Check className="w-5 h-5" />
             </div>
-            <h3 className="text-2xl font-bold text-slate-900">VIP Slot Dispatched!</h3>
-            <p className="text-xs text-slate-600 max-w-md mx-auto">
-              Your test drive reservation for <span className="text-slate-900 font-semibold">{vehicle.make} {vehicle.model}</span> at <span className="text-slate-900 font-medium">{showroomBranch}</span> on <span className="text-slate-900 font-mono">{testDriveDate}</span> ({timeSlot}) is scheduled.
+            <h3 className="text-xl font-normal text-neutral-900 tracking-tight">VIP Slot Reserved</h3>
+            <p className="text-xs text-neutral-500 font-light max-w-md mx-auto leading-relaxed">
+              Your test drive for <span className="text-neutral-900 font-medium">{vehicle.make} {vehicle.model}</span> at <span className="text-neutral-900 font-medium">{showroomBranch}</span> on <span className="text-neutral-900 font-mono">{testDriveDate}</span> ({timeSlot}) is scheduled.
             </p>
           </div>
         ) : activeTab === 'finance' ? (
-          /* FINANCE CALCULATOR TAB */
-          <div className="p-6 space-y-6 overflow-y-auto">
+          /* FINANCE TAB */
+          <div className="p-8 space-y-6 overflow-y-auto flex-1">
 
-            {/* Purchase Price Summary */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+            {/* Price & Monthly Summary */}
+            <div className="p-5 rounded-2xl bg-white border border-neutral-200/80 flex items-center justify-between">
               <div>
-                <span className="text-xs text-slate-500 uppercase tracking-wider">Vehicle Listing Price</span>
-                <div className="text-2xl font-extrabold text-slate-900 font-mono">${vehicle.purchasePrice.toLocaleString()}</div>
+                <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Purchase Price</span>
+                <div className="text-xl font-medium text-neutral-900 tracking-tight">${vehicle.purchasePrice.toLocaleString()}</div>
               </div>
               <div className="text-right">
-                <span className="text-xs text-slate-600 uppercase tracking-wider font-semibold">Estimated Loan</span>
-                <div className="text-2xl font-extrabold text-slate-900 font-mono">${Math.round(monthlyPayment).toLocaleString()} / mo</div>
+                <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Est. Monthly</span>
+                <div className="text-xl font-mono text-neutral-900">${Math.round(monthlyPayment).toLocaleString()} / mo</div>
               </div>
             </div>
 
-            {/* Slider Controls */}
-            <div className="space-y-5 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+            {/* Controls */}
+            <div className="space-y-5 bg-white p-6 rounded-2xl border border-neutral-200/80">
 
-              {/* Down Payment Slider */}
+              {/* Down Payment */}
               <div className="space-y-2">
-                <div className="flex justify-between text-xs font-semibold">
-                  <span className="text-slate-700">Down Payment</span>
-                  <span className="text-slate-900 font-mono">${downPayment.toLocaleString()} ({Math.round((downPayment / vehicle.purchasePrice) * 100)}%)</span>
+                <div className="flex justify-between text-xs">
+                  <span className="text-neutral-500 font-light">Down Payment</span>
+                  <span className="text-neutral-900 font-mono">${downPayment.toLocaleString()} ({Math.round((downPayment / vehicle.purchasePrice) * 100)}%)</span>
                 </div>
                 <input
                   type="range"
@@ -145,23 +144,23 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
                   step={1000}
                   value={downPayment}
                   onChange={(e) => setDownPayment(Number(e.target.value))}
-                  className="w-full accent-slate-900 cursor-pointer h-2 bg-slate-200 rounded-lg"
+                  className="w-full accent-neutral-900 cursor-pointer h-1 bg-neutral-200 rounded-lg"
                 />
               </div>
 
               {/* Loan Term Selection */}
               <div className="space-y-2">
-                <span className="text-xs font-semibold text-slate-700 block">Loan Duration (Months)</span>
+                <span className="text-xs text-neutral-500 font-light block">Term Length</span>
                 <div className="grid grid-cols-4 gap-2">
                   {[24, 36, 48, 60].map((term) => (
                     <button
                       key={term}
                       type="button"
                       onClick={() => setLoanTermMonths(term)}
-                      className={`py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                      className={`py-2 rounded-full text-xs font-mono transition-all cursor-pointer ${
                         loanTermMonths === term
-                          ? 'bg-slate-900 text-white shadow-xs'
-                          : 'bg-white text-slate-600 border border-slate-200 hover:text-slate-900'
+                          ? 'bg-neutral-900 text-white'
+                          : 'bg-neutral-100 text-neutral-600 hover:text-neutral-900'
                       }`}
                     >
                       {term} Mo
@@ -170,11 +169,11 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
                 </div>
               </div>
 
-              {/* Interest Rate Slider */}
+              {/* APR Rate Slider */}
               <div className="space-y-2">
-                <div className="flex justify-between text-xs font-semibold">
-                  <span className="text-slate-700">Interest Rate (APR)</span>
-                  <span className="text-slate-900 font-mono">{interestRate}%</span>
+                <div className="flex justify-between text-xs">
+                  <span className="text-neutral-500 font-light">APR Interest Rate</span>
+                  <span className="text-neutral-900 font-mono">{interestRate}%</span>
                 </div>
                 <input
                   type="range"
@@ -183,78 +182,56 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
                   step={0.1}
                   value={interestRate}
                   onChange={(e) => setInterestRate(Number(e.target.value))}
-                  className="w-full accent-slate-900 cursor-pointer h-2 bg-slate-200 rounded-lg"
+                  className="w-full accent-neutral-900 cursor-pointer h-1 bg-neutral-200 rounded-lg"
                 />
               </div>
 
-            </div>
-
-            {/* Financial Summary */}
-            <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-mono">
-              <div>
-                <span className="text-slate-500 block text-[10px] uppercase font-sans">Total Financed Amount</span>
-                <span className="text-slate-900 font-bold">${principal.toLocaleString()}</span>
-              </div>
-              <div>
-                <span className="text-slate-500 block text-[10px] uppercase font-sans">Total Estimated Interest</span>
-                <span className="text-slate-900 font-bold">${Math.round(totalInterest).toLocaleString()}</span>
-              </div>
             </div>
 
             <button
               onClick={() => setActiveTab('test-drive')}
-              className="w-full py-3.5 rounded-2xl bg-[#0B192C] hover:bg-slate-800 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full py-3.5 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-medium uppercase tracking-wider transition-all cursor-pointer"
             >
-              <span>Apply Calculation & Book Test Drive</span>
+              Proceed to Book Test Drive
             </button>
 
           </div>
         ) : (
-          /* BOOK TEST DRIVE TAB */
-          <form onSubmit={handleTestDriveSubmit} className="p-6 space-y-4 overflow-y-auto">
+          /* TEST DRIVE FORM */
+          <form onSubmit={handleTestDriveSubmit} className="p-8 space-y-4 overflow-y-auto flex-1">
+
+            <div className="space-y-1">
+              <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Full Name</label>
+              <input
+                type="text"
+                required
+                placeholder="Lord Alexander Vance"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full bg-white border border-neutral-200/80 rounded-xl px-4 py-3 text-xs text-neutral-900 focus:outline-none focus:border-neutral-900"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Phone Contact</label>
+              <input
+                type="tel"
+                required
+                placeholder="+1 (555) 019-2834"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full bg-white border border-neutral-200/80 rounded-xl px-4 py-3 text-xs text-neutral-900 focus:outline-none focus:border-neutral-900"
+              />
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1">
-                  <User className="w-3.5 h-3.5 text-slate-500" /> Full Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Lord Alexander Vance"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-slate-400"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1">
-                  <Phone className="w-3.5 h-3.5 text-slate-500" /> Phone Contact
-                </label>
-                <input
-                  type="tel"
-                  required
-                  placeholder="+1 (555) 019-2834"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-slate-400"
-                />
-              </div>
-
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-slate-500" /> Showroom
-                </label>
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Showroom Hub</label>
                 <select
                   value={showroomBranch}
                   onChange={(e) => setShowroomBranch(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-slate-400"
+                  className="w-full bg-white border border-neutral-200/80 rounded-xl px-4 py-3 text-xs text-neutral-900 focus:outline-none focus:border-neutral-900"
                 >
                   {AVAILABLE_LOCATIONS.map((loc) => (
                     <option key={loc} value={loc}>
@@ -264,41 +241,37 @@ export const FinanceAndTestDriveModal: React.FC<FinanceAndTestDriveModalProps> =
                 </select>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-slate-500" /> Preferred Date
-                </label>
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Preferred Date</label>
                 <input
                   type="date"
                   required
                   value={testDriveDate}
                   onChange={(e) => setTestDriveDate(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-slate-400"
+                  className="w-full bg-white border border-neutral-200/80 rounded-xl px-4 py-3 text-xs text-neutral-900 focus:outline-none focus:border-neutral-900"
                 />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-slate-500" /> Time Slot
-                </label>
-                <select
-                  value={timeSlot}
-                  onChange={(e) => setTimeSlot(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-slate-400"
-                >
-                  <option value="10:00 AM">10:00 AM Morning</option>
-                  <option value="14:00 PM">14:00 PM Afternoon</option>
-                  <option value="17:00 PM">17:00 PM Sunset Drive</option>
-                </select>
               </div>
 
             </div>
 
+            <div className="space-y-1">
+              <label className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">Time Slot</label>
+              <select
+                value={timeSlot}
+                onChange={(e) => setTimeSlot(e.target.value)}
+                className="w-full bg-white border border-neutral-200/80 rounded-xl px-4 py-3 text-xs text-neutral-900 focus:outline-none focus:border-neutral-900"
+              >
+                <option value="10:00 AM">10:00 AM Morning Appointment</option>
+                <option value="14:00 PM">14:00 PM Afternoon Appointment</option>
+                <option value="17:00 PM">17:00 PM Private Sunset Drive</option>
+              </select>
+            </div>
+
             <button
               type="submit"
-              className="w-full py-3.5 rounded-2xl bg-[#0B192C] hover:bg-slate-800 text-white font-bold text-sm shadow-md transition-all mt-4 cursor-pointer"
+              className="w-full py-3.5 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-medium uppercase tracking-wider transition-all cursor-pointer mt-4"
             >
-              Confirm Showroom VIP Test Drive
+              Schedule VIP Test Drive
             </button>
 
           </form>

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Vehicle, PlatformMode } from '@/types/vehicle';
-import { X, Check, Gauge, Cpu, Fuel, ArrowRight } from 'lucide-react';
+import { X, ArrowRight } from 'lucide-react';
 
 interface VehicleDetailsModalProps {
   vehicle: Vehicle | null;
@@ -22,112 +22,105 @@ export const VehicleDetailsModal: React.FC<VehicleDetailsModalProps> = ({
   const [activeImage, setActiveImage] = useState(vehicle.image);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex justify-end bg-neutral-900/40 backdrop-blur-xs animate-in fade-in duration-300">
 
-      <div className="relative w-full max-w-4xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col">
+      {/* Slide-over Drawer / Sheet */}
+      <div className="relative w-full max-w-2xl bg-[#F8F9FA] h-full shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-right duration-300">
 
-        {/* Header Bar */}
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50 sticky top-0 z-20">
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-mono px-2.5 py-1 rounded bg-slate-200 text-slate-800 font-bold uppercase">
-              {vehicle.make}
+        {/* Drawer Header */}
+        <div className="px-8 py-6 border-b border-neutral-200/80 bg-white flex items-center justify-between sticky top-0 z-20">
+          <div>
+            <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">
+              {vehicle.make} · {vehicle.year}
             </span>
-            <h2 className="text-xl font-bold text-slate-900 font-sans">{vehicle.model} ({vehicle.year})</h2>
+            <h2 className="text-xl font-normal text-neutral-900 tracking-tight">{vehicle.model}</h2>
           </div>
           <button
             onClick={onClose}
             aria-label="Close vehicle details"
-            className="p-2 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+            className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Modal Scrollable Content Body */}
-        <div className="p-6 sm:p-8 space-y-8 overflow-y-auto">
+        {/* Scrollable Content Body */}
+        <div className="p-8 space-y-8 overflow-y-auto flex-1">
 
-          {/* Main Gallery Image & Thumbnails */}
-          <div className="space-y-4">
-            <div className="relative h-72 sm:h-96 w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
+          {/* Studio Gallery Image */}
+          <div className="space-y-3">
+            <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-neutral-200 border border-neutral-200/80">
               <img
                 src={activeImage}
                 alt={vehicle.model}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute top-4 left-4 flex gap-2">
-                {vehicle.badges.map((b, idx) => (
-                  <span key={idx} className="text-xs font-semibold px-3 py-1 rounded-md bg-white/90 text-slate-800 border border-slate-200 shadow-xs backdrop-blur-md">
-                    {b.label}
-                  </span>
-                ))}
-              </div>
             </div>
 
-            {/* Thumbnail Row */}
+            {/* Gallery Thumbnails */}
             {vehicle.gallery.length > 1 && (
-              <div className="flex items-center gap-3 overflow-x-auto pb-1">
+              <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-none">
                 {vehicle.gallery.map((imgUrl, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveImage(imgUrl)}
-                    className={`relative w-24 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
-                      activeImage === imgUrl ? 'border-slate-900 ring-2 ring-slate-900/20' : 'border-slate-200 opacity-70 hover:opacity-100'
+                    className={`relative w-20 h-14 rounded-lg overflow-hidden border transition-all cursor-pointer shrink-0 ${
+                      activeImage === imgUrl ? 'border-neutral-900 ring-1 ring-neutral-900' : 'border-neutral-200 opacity-60 hover:opacity-100'
                     }`}
                   >
-                    <img src={imgUrl} alt={`Gallery ${i}`} className="w-full h-full object-cover" />
+                    <img src={imgUrl} alt={`Gallery thumbnail ${i}`} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Quick Specs Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <div className="space-y-1">
-              <span className="text-[11px] text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                <Gauge className="w-3.5 h-3.5 text-slate-500" /> Acceleration
-              </span>
-              <p className="text-sm font-bold text-slate-900 font-mono">{vehicle.specs.acceleration}</p>
-            </div>
-
-            <div className="space-y-1">
-              <span className="text-[11px] text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                <Cpu className="w-3.5 h-3.5 text-slate-500" /> Powertrain
-              </span>
-              <p className="text-sm font-bold text-slate-900 font-mono">{vehicle.specs.power}</p>
-            </div>
-
-            <div className="space-y-1">
-              <span className="text-[11px] text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                <Fuel className="w-3.5 h-3.5 text-slate-500" /> Range / Econ
-              </span>
-              <p className="text-sm font-bold text-slate-900 font-mono">{vehicle.specs.fuelEconomyOrRange}</p>
-            </div>
-
-            <div className="space-y-1">
-              <span className="text-[11px] text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                <Gauge className="w-3.5 h-3.5 text-slate-500" /> Top Speed
-              </span>
-              <p className="text-sm font-bold text-slate-900 font-mono">{vehicle.specs.topSpeed}</p>
-            </div>
-          </div>
-
           {/* Description */}
           <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Vehicle Overview</h3>
-            <p className="text-sm text-slate-600 leading-relaxed">{vehicle.description}</p>
+            <h3 className="text-[11px] uppercase tracking-widest text-neutral-400 font-medium">Overview</h3>
+            <p className="text-sm font-light text-neutral-600 leading-relaxed">{vehicle.description}</p>
           </div>
 
-          {/* Features List */}
+          {/* Comprehensive Specification Table with Horizontal Dividers */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Key Executive Features</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <h3 className="text-[11px] uppercase tracking-widest text-neutral-400 font-medium">Technical Specification</h3>
+
+            <div className="bg-white rounded-2xl border border-neutral-200/80 divide-y divide-neutral-100 text-xs text-neutral-800">
+              <div className="p-4 flex items-center justify-between">
+                <span className="text-neutral-500 font-light">Powertrain & Power</span>
+                <span className="font-medium text-neutral-900">{vehicle.specs.power}</span>
+              </div>
+              <div className="p-4 flex items-center justify-between">
+                <span className="text-neutral-500 font-light">0-100 km/h Acceleration</span>
+                <span className="font-medium text-neutral-900">{vehicle.specs.acceleration}</span>
+              </div>
+              <div className="p-4 flex items-center justify-between">
+                <span className="text-neutral-500 font-light">Transmission</span>
+                <span className="font-medium text-neutral-900">{vehicle.specs.transmission} ({vehicle.specs.drivetrain})</span>
+              </div>
+              <div className="p-4 flex items-center justify-between">
+                <span className="text-neutral-500 font-light">Range / Economy</span>
+                <span className="font-medium text-neutral-900">{vehicle.specs.fuelEconomyOrRange}</span>
+              </div>
+              <div className="p-4 flex items-center justify-between">
+                <span className="text-neutral-500 font-light">Top Speed</span>
+                <span className="font-medium text-neutral-900">{vehicle.specs.topSpeed}</span>
+              </div>
+              <div className="p-4 flex items-center justify-between">
+                <span className="text-neutral-500 font-light">Seating Capacity</span>
+                <span className="font-medium text-neutral-900">{vehicle.specs.seats} Passengers</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Key Features List */}
+          <div className="space-y-3">
+            <h3 className="text-[11px] uppercase tracking-widest text-neutral-400 font-medium">Equipment & Highlights</h3>
+            <div className="bg-white rounded-2xl border border-neutral-200/80 p-5 space-y-3">
               {vehicle.features.map((feat, idx) => (
-                <div key={idx} className="flex items-center gap-2.5 text-xs text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                  <div className="w-5 h-5 rounded-md bg-slate-200 flex items-center justify-center shrink-0">
-                    <Check className="w-3.5 h-3.5 text-slate-700" />
-                  </div>
-                  <span>{feat}</span>
+                <div key={idx} className="flex items-start gap-3 text-xs text-neutral-700">
+                  <span className="text-neutral-400 font-mono">·</span>
+                  <span className="font-light">{feat}</span>
                 </div>
               ))}
             </div>
@@ -135,25 +128,19 @@ export const VehicleDetailsModal: React.FC<VehicleDetailsModalProps> = ({
 
         </div>
 
-        {/* Footer Pricing & CTA Action */}
-        <div className="p-6 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-0 z-20">
+        {/* Drawer Footer CTA */}
+        <div className="px-8 py-5 bg-white border-t border-neutral-200/80 flex items-center justify-between sticky bottom-0 z-20">
           <div>
-            {mode === 'rent' ? (
-              <div>
-                <span className="text-xs text-slate-500 uppercase tracking-wider">Daily Rental Rate</span>
-                <div className="text-2xl font-extrabold text-slate-900 font-mono">
-                  ${vehicle.rentalPricePerDay} <span className="text-xs font-normal text-slate-500">/ day</span>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <span className="text-xs text-slate-500 uppercase tracking-wider">Purchase Price</span>
-                <div className="text-2xl font-extrabold text-slate-900 font-mono">
-                  ${vehicle.purchasePrice.toLocaleString()}
-                </div>
-                <div className="text-xs text-slate-600 font-mono">From ${vehicle.estMonthlyLoan}/mo Financing</div>
-              </div>
-            )}
+            <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">
+              {mode === 'rent' ? 'Daily Rental Rate' : 'Purchase Listing'}
+            </span>
+            <div className="text-xl font-normal text-neutral-900 tracking-tight">
+              {mode === 'rent' ? (
+                <>${vehicle.rentalPricePerDay} <span className="text-xs text-neutral-400 font-light">/ day</span></>
+              ) : (
+                <>${vehicle.purchasePrice.toLocaleString()}</>
+              )}
+            </div>
           </div>
 
           <button
@@ -161,10 +148,10 @@ export const VehicleDetailsModal: React.FC<VehicleDetailsModalProps> = ({
               onClose();
               onBookNow(vehicle);
             }}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 bg-[#0B192C] hover:bg-slate-800 text-white shadow-md transition-all cursor-pointer"
+            className="px-7 py-3 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-medium uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2"
           >
-            <span>{mode === 'rent' ? 'Proceed to Reservation' : 'Finance & Test Drive'}</span>
-            <ArrowRight className="w-4 h-4" />
+            <span>{mode === 'rent' ? 'Proceed to Reserve' : 'Request Test Drive'}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 

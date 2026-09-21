@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { SearchFilterState } from '@/types/vehicle';
-import { Search, ArrowUpDown, RefreshCcw } from 'lucide-react';
+import { Search, ChevronDown, RotateCcw } from 'lucide-react';
 
 interface QuickFiltersProps {
   filters: SearchFilterState;
@@ -14,7 +14,7 @@ interface QuickFiltersProps {
 const BODY_TYPES: { label: string; value: string }[] = [
   { label: 'All Models', value: 'All' },
   { label: 'Electric (EV)', value: 'EV' },
-  { label: 'Luxury SUV', value: 'SUV' },
+  { label: 'Executive SUV', value: 'SUV' },
   { label: 'Coupé', value: 'Coupe' },
   { label: 'Sports Car', value: 'Sports Car' }
 ];
@@ -26,21 +26,21 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
   totalResults,
 }) => {
   return (
-    <div className="space-y-6 mb-8">
+    <div className="space-y-6 mb-12">
 
-      {/* Category Pills & Top Controls Bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      {/* Category Filter Pills & Search Control */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-neutral-200/80">
 
-        {/* Category Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
+        {/* Minimalist Category Buttons */}
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-2 lg:pb-0">
           {BODY_TYPES.map((bt) => (
             <button
               key={bt.value}
               onClick={() => onFilterChange({ bodyType: bt.value })}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-300 cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-xs font-medium uppercase tracking-wider whitespace-nowrap transition-all duration-300 cursor-pointer ${
                 filters.bodyType === bt.value
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
+                  ? 'bg-neutral-900 text-white shadow-xs'
+                  : 'bg-white text-neutral-600 hover:text-neutral-900 border border-neutral-200/80'
               }`}
             >
               {bt.label}
@@ -48,57 +48,57 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({
           ))}
         </div>
 
-        {/* Search Input, Sort Dropdown & Reset */}
-        <div className="flex flex-wrap items-center gap-3">
+        {/* Quick Search & Sort */}
+        <div className="flex items-center gap-3">
 
-          {/* Quick Search */}
-          <div className="relative flex-1 sm:w-64">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          {/* Quick Search Box */}
+          <div className="relative flex-1 sm:w-60">
+            <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search make or model..."
+              placeholder="Filter model..."
               value={filters.searchQuery}
               onChange={(e) => onFilterChange({ searchQuery: e.target.value })}
-              className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-400 shadow-xs"
+              className="w-full bg-white border border-neutral-200/80 rounded-full pl-9 pr-4 py-2 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900"
             />
           </div>
 
-          {/* Sort By */}
-          <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 shadow-xs">
-            <ArrowUpDown className="w-3.5 h-3.5 text-slate-500" />
+          {/* Sort Dropdown */}
+          <div className="relative flex items-center bg-white border border-neutral-200/80 rounded-full px-4 py-2 text-xs font-medium text-neutral-900">
             <select
               value={filters.sortBy}
               onChange={(e) => onFilterChange({ sortBy: e.target.value as any })}
-              className="bg-transparent text-slate-800 focus:outline-none cursor-pointer text-xs font-medium"
+              className="bg-transparent focus:outline-none cursor-pointer pr-5 appearance-none text-xs"
             >
-              <option value="featured" className="bg-white text-slate-800">Featured First</option>
-              <option value="price-asc" className="bg-white text-slate-800">Price: Low to High</option>
-              <option value="price-desc" className="bg-white text-slate-800">Price: High to Low</option>
-              <option value="year-desc" className="bg-white text-slate-800">Newest Year</option>
-              <option value="rating" className="bg-white text-slate-800">Highest Rated</option>
+              <option value="featured">Featured First</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="year-desc">Newest Generation</option>
             </select>
+            <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute right-3 pointer-events-none" />
           </div>
 
-          {/* Reset Button */}
+          {/* Reset Filters */}
           <button
             onClick={onResetFilters}
-            className="p-2 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-xs cursor-pointer"
+            aria-label="Reset all filters"
+            className="p-2 rounded-full bg-white border border-neutral-200/80 text-neutral-400 hover:text-neutral-900 transition-colors cursor-pointer"
             title="Reset Filters"
           >
-            <RefreshCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
 
         </div>
 
       </div>
 
-      {/* Results Count Banner */}
-      <div className="flex items-center justify-between text-xs text-slate-500 border-b border-slate-200/80 pb-4">
+      {/* Quiet Results Counter */}
+      <div className="flex items-center justify-between text-[11px] uppercase tracking-widest text-neutral-400 font-medium">
         <div>
-          Showing <span className="text-slate-900 font-bold">{totalResults}</span> luxury vehicles matching criteria
+          Showing <span className="text-neutral-900 font-bold">{totalResults}</span> Curated Vehicles
         </div>
-        <div className="text-[11px] font-mono text-slate-500">
-          Mode: <span className="text-slate-900 uppercase font-semibold">{filters.mode}</span>
+        <div>
+          Portfolio Mode: <span className="text-neutral-900 font-semibold">{filters.mode === 'rent' ? 'Rental' : 'Sales'}</span>
         </div>
       </div>
 

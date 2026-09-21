@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Vehicle, PlatformMode } from '@/types/vehicle';
-import { X, Gauge, Cpu, Fuel, Users, DollarSign } from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface ComparisonModalProps {
   vehicles: Vehicle[];
@@ -22,125 +22,112 @@ export const ComparisonModal: React.FC<ComparisonModalProps> = ({
   if (vehicles.length === 0) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-neutral-900/40 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-200">
 
-      <div className="relative w-full max-w-6xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col">
+      <div className="relative w-full max-w-5xl bg-[#F8F9FA] border border-neutral-200 rounded-3xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col">
 
-        {/* Header Bar */}
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50 sticky top-0 z-20">
+        {/* Modal Header */}
+        <div className="px-8 py-6 border-b border-neutral-200/80 bg-white flex items-center justify-between sticky top-0 z-20">
           <div>
-            <h2 className="text-xl font-bold text-slate-900 font-sans">Side-by-Side Vehicle Matrix</h2>
-            <p className="text-xs text-slate-500">Comparing specifications, dynamics, and financial options</p>
+            <span className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium block">
+              Side-by-Side Analysis
+            </span>
+            <h2 className="text-lg font-normal text-neutral-900 tracking-tight">Specification Matrix</h2>
           </div>
           <button
             onClick={onClose}
             aria-label="Close comparison modal"
-            className="p-2 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+            className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Modal Scrollable Table Body */}
-        <div className="p-6 overflow-x-auto overflow-y-auto">
-          <table className="w-full text-left text-sm text-slate-700 border-collapse min-w-[600px]">
+        {/* Matrix Table Body */}
+        <div className="p-8 overflow-x-auto flex-1">
+          <table className="w-full text-left text-xs text-neutral-800 border-collapse min-w-[650px]">
             <thead>
-              <tr className="border-b border-slate-200">
-                <th className="p-4 text-xs font-semibold uppercase tracking-wider text-slate-500 w-1/4">Specification</th>
+              <tr className="border-b border-neutral-200/80">
+                <th className="p-4 text-[10px] uppercase tracking-widest text-neutral-400 font-medium w-1/4">Metric</th>
                 {vehicles.map((v) => (
-                  <th key={v.id} className="p-4 text-center align-top relative min-w-[220px]">
+                  <th key={v.id} className="p-4 text-center align-top relative">
                     <button
                       onClick={() => onRemoveVehicle(v.id)}
-                      aria-label={`Remove ${v.model} from comparison matrix`}
-                      className="absolute top-2 right-2 p-1 rounded-full bg-slate-200 hover:bg-red-500 hover:text-white text-slate-500 transition-colors cursor-pointer"
+                      aria-label={`Remove ${v.model} from matrix`}
+                      className="absolute top-2 right-2 p-1 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-400 hover:text-neutral-900 transition-colors cursor-pointer"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
-                    <div className="h-32 rounded-xl overflow-hidden bg-slate-100 mb-3 border border-slate-200">
+                    <div className="aspect-[16/10] rounded-xl overflow-hidden bg-neutral-200 mb-3 border border-neutral-200/80">
                       <img src={v.image} alt={v.model} className="w-full h-full object-cover" />
                     </div>
-                    <div className="text-xs text-slate-500 font-mono">{v.make} ({v.year})</div>
-                    <div className="text-base font-bold text-slate-900 mb-2">{v.model}</div>
+                    <div className="text-[10px] uppercase tracking-widest text-neutral-400 font-medium">{v.make}</div>
+                    <div className="text-sm font-normal text-neutral-900 mb-3">{v.model}</div>
                     <button
                       onClick={() => {
                         onClose();
                         onSelectVehicleForAction(v);
                       }}
-                      className="w-full py-2 px-3 rounded-xl text-xs font-bold transition-all shadow-xs bg-slate-900 hover:bg-slate-800 text-white cursor-pointer"
+                      className="w-full py-2 rounded-full text-xs font-medium uppercase tracking-wider bg-neutral-900 hover:bg-neutral-800 text-white transition-all cursor-pointer"
                     >
-                      {mode === 'rent' ? 'Reserve Now' : 'Book Test Drive'}
+                      {mode === 'rent' ? 'Reserve' : 'Inquire'}
                     </button>
                   </th>
                 ))}
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-neutral-200/60 bg-white">
 
-              {/* Daily Rate / Purchase Price */}
-              <tr className="bg-slate-50/60">
-                <td className="p-4 font-semibold text-slate-900 flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-slate-600" /> Pricing Structure
-                </td>
+              {/* Pricing Row */}
+              <tr>
+                <td className="p-4 text-[10px] uppercase tracking-widest text-neutral-400 font-medium">Pricing</td>
                 {vehicles.map((v) => (
-                  <td key={v.id} className="p-4 text-center font-mono font-bold text-slate-900">
+                  <td key={v.id} className="p-4 text-center font-medium text-neutral-900 text-sm">
                     {mode === 'rent' ? (
-                      <div>
-                        <div className="text-lg text-slate-900">${v.rentalPricePerDay} / day</div>
-                        <div className="text-[11px] text-slate-500 font-normal font-sans">Includes Standard Insurance</div>
-                      </div>
+                      <>${v.rentalPricePerDay} <span className="text-xs font-light text-neutral-400">/ day</span></>
                     ) : (
-                      <div>
-                        <div className="text-lg text-slate-900">${v.purchasePrice.toLocaleString()}</div>
-                        <div className="text-[11px] text-slate-500 font-normal font-sans">From ${v.estMonthlyLoan}/mo</div>
-                      </div>
+                      <>${v.purchasePrice.toLocaleString()}</>
                     )}
                   </td>
                 ))}
               </tr>
 
-              {/* Engine / Powertrain */}
+              {/* Acceleration */}
               <tr>
-                <td className="p-4 text-xs text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                  <Cpu className="w-4 h-4 text-slate-500" /> Engine & Power
-                </td>
+                <td className="p-4 text-[10px] uppercase tracking-widest text-neutral-400 font-medium">0-100 Acceleration</td>
                 {vehicles.map((v) => (
-                  <td key={v.id} className="p-4 text-center">
-                    <div className="font-semibold text-slate-900">{v.specs.engine}</div>
-                    <div className="text-xs font-mono text-slate-600">{v.specs.power}</div>
+                  <td key={v.id} className="p-4 text-center text-neutral-900 font-medium">
+                    {v.specs.acceleration}
                   </td>
                 ))}
               </tr>
 
-              {/* 0-100 Acceleration */}
-              <tr className="bg-slate-50/60">
-                <td className="p-4 text-xs text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                  <Gauge className="w-4 h-4 text-slate-500" /> 0-100 km/h Sprint
-                </td>
+              {/* Power */}
+              <tr>
+                <td className="p-4 text-[10px] uppercase tracking-widest text-neutral-400 font-medium">Power Output</td>
                 {vehicles.map((v) => (
-                  <td key={v.id} className="p-4 text-center font-mono font-bold text-slate-900 text-base">
-                    {v.specs.acceleration}
+                  <td key={v.id} className="p-4 text-center text-neutral-800 font-light">
+                    {v.specs.power}
                   </td>
                 ))}
               </tr>
 
               {/* Transmission & Drivetrain */}
               <tr>
-                <td className="p-4 text-xs text-slate-500 uppercase tracking-wider">Transmission & Drivetrain</td>
+                <td className="p-4 text-[10px] uppercase tracking-widest text-neutral-400 font-medium">Gearbox & Drivetrain</td>
                 {vehicles.map((v) => (
-                  <td key={v.id} className="p-4 text-center font-mono text-slate-800">
+                  <td key={v.id} className="p-4 text-center text-neutral-800 font-light">
                     {v.specs.transmission} ({v.specs.drivetrain})
                   </td>
                 ))}
               </tr>
 
-              {/* Fuel / Battery Range */}
-              <tr className="bg-slate-50/60">
-                <td className="p-4 text-xs text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                  <Fuel className="w-4 h-4 text-slate-500" /> Range / Fuel Economy
-                </td>
+              {/* Range / Fuel */}
+              <tr>
+                <td className="p-4 text-[10px] uppercase tracking-widest text-neutral-400 font-medium">Range / Economy</td>
                 {vehicles.map((v) => (
-                  <td key={v.id} className="p-4 text-center font-mono text-slate-800">
+                  <td key={v.id} className="p-4 text-center text-neutral-800 font-light">
                     {v.specs.fuelEconomyOrRange}
                   </td>
                 ))}
@@ -148,12 +135,10 @@ export const ComparisonModal: React.FC<ComparisonModalProps> = ({
 
               {/* Seating */}
               <tr>
-                <td className="p-4 text-xs text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                  <Users className="w-4 h-4 text-slate-500" /> Seating Capacity
-                </td>
+                <td className="p-4 text-[10px] uppercase tracking-widest text-neutral-400 font-medium">Seating</td>
                 {vehicles.map((v) => (
-                  <td key={v.id} className="p-4 text-center font-mono text-slate-900">
-                    {v.specs.seats} Passengers
+                  <td key={v.id} className="p-4 text-center text-neutral-800 font-light">
+                    {v.specs.seats} Seats
                   </td>
                 ))}
               </tr>

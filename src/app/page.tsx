@@ -12,8 +12,6 @@ import { ComparisonTray } from '@/components/comparison/ComparisonTray';
 import { ComparisonModal } from '@/components/comparison/ComparisonModal';
 import { RentalBookingModal } from '@/components/modals/RentalBookingModal';
 import { FinanceAndTestDriveModal } from '@/components/modals/FinanceAndTestDriveModal';
-import { ConciergeWidget } from '@/components/ai-assistant/ConciergeWidget';
-
 const DEFAULT_FILTERS: SearchFilterState = {
   mode: 'rent',
   searchQuery: '',
@@ -250,9 +248,6 @@ export default function AutoElitePlatform() {
           onSuccess={() => setSalesModalVehicle(null)}
         />
       )}
-
-      {/* Floating AI Car Concierge Drawer Widget */}
-      <ConciergeWidget onSelectVehicle={(v) => setSelectedVehicleForDetails(v)} />
 
     </div>
   );
