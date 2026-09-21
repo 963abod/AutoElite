@@ -4,7 +4,7 @@ import React from 'react';
 import { Vehicle, PlatformMode, SearchFilterState } from '@/types/vehicle';
 import { VehicleCard } from './VehicleCard';
 import { QuickFilters } from './QuickFilters';
-import { Car, SearchX } from 'lucide-react';
+import { SearchX } from 'lucide-react';
 
 interface VehicleGridProps {
   vehicles: Vehicle[];
@@ -73,17 +73,17 @@ export const VehicleGrid: React.FC<VehicleGridProps> = ({
         </div>
       ) : (
         /* Empty State */
-        <div className="glass-card rounded-2xl p-12 text-center max-w-lg mx-auto border border-white/10 space-y-4">
-          <div className="w-16 h-16 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center mx-auto text-gray-400">
+        <div className="bg-white rounded-2xl p-12 text-center max-w-lg mx-auto border border-slate-200 shadow-sm space-y-4">
+          <div className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center mx-auto text-slate-500">
             <SearchX className="w-8 h-8" />
           </div>
-          <h3 className="text-xl font-bold text-white">No Matching Vehicles Found</h3>
-          <p className="text-xs text-gray-400">
+          <h3 className="text-xl font-bold text-slate-900">No Matching Vehicles Found</h3>
+          <p className="text-xs text-slate-500">
             We couldn't find any vehicles matching your search criteria. Try adjusting your price budget, location, or body style filters.
           </p>
           <button
             onClick={onResetFilters}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-blue-500/20 transition-all"
+            className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-xs transition-all cursor-pointer"
           >
             Reset All Filters
           </button>
