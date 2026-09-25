@@ -9,7 +9,15 @@ import { formatKm, formatUsd } from "@/lib/utils";
 import { SpecBadge } from "@/components/SpecBadge";
 
 export function CarCard({ car }: { car: Car }) {
-  const imgSrc = car.heroImage || (car.images && car.images[0]) || "https://picsum.photos/seed/apex-car/800/600";
+  const carData = car as any;
+
+  // جلب رابط الصورة بأمان تام وتوافق مع كافة مسميات الخصائص
+  const imgSrc =
+    carData.heroImage ||
+    (Array.isArray(carData.gallery) && carData.gallery[0]) ||
+    (Array.isArray(carData.images) && carData.images[0]) ||
+    carData.image_url ||
+    "https://picsum.photos/seed/apex-car/800/600";
 
   return (
     <motion.div
