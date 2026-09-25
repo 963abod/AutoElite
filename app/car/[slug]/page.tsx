@@ -3,22 +3,162 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { ChevronLeft, Gauge, Cog, ShieldCheck, Palette, Fingerprint, Calendar } from "lucide-react";
+import { createClient } from "@supabase/supabase-js";
 import { CARS, getCarBySlug } from "@/lib/data";
 import { formatKm, formatUsd } from "@/lib/utils";
 import { CarGallery } from "@/components/CarGallery";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CarCard } from "@/components/CarCard";
+import type { Car } from "@/types/car";
 
-export function generateStaticParams() {
-  return CARS.map((car) => ({ slug: car.slug }));
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
+function formatCar(c: any): Car {
+  const extractedImages: string[] = [];
+
+  if (Array.isArray(c.car_images) && c.car_images.length > 0) {
+    const sorted = [...c.car_images].sort(
+      (a: any, b: any) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0)
+    );
+    sorted.forEach((img: any) => {
+      const url = typeof img === "string" ? img : img?.image_url || img?.url || img?.image;
+      if (url && !extractedImages.includes(url)) extractedImages.push(url);
+    });
+  }
+
+  if (Array.isArray(c.images)) {
+    c.images.forEach((img: any) => {
+      const url = typeof img === "string" ? img : img?.url || img?.image_url;
+      if (url && !extractedImages.includes(url)) extractedImages.push(url);
+    });
+  }
+
+  const directFields = [
+    c.main_image,
+    c.image,
+    c.image_url,
+    c.cover_image,
+    c.thumbnail,
+    c.photo,
+    c.photo_url,
+  ];
+
+  directFields.forEach((field) => {
+    if (field && typeof field === "string" && !extractedImages.includes(field)) {
+      extractedImages.unshift(field);
+    }
+  });
+
+  if (extractedImages.length === 0) {
+    extractedImages.push("https://picsum.photos/seed/apex-car/800/600");
+  }
+
+  const primaryImg = extractedImages[0];
+  const price = Number(c.price_usd ?? c.price ?? c.priceUsd ?? 0);
+  const year = Number(c.year) || 2024;
+
+  return ({
+    id: c.id?.toString() || Math.random().toString(),
+    slug: c.slug || `car-${c.id}`,
+    name: c.name || `${c.brand || ""} ${c.model || ""}`.trim() || "سيارة فاخرة",
+    brand: c.brand || "أخرى",
+    model: c.model || "",
+    year: year,
+    priceUsd: price,
+    mileageKm: Number(c.mileage_km ?? c.mileage ?? c.mileageKm ?? 0),
+    fuelType: c.fuel_type || c.fuelType || "بنزين",
+    transmission: c.transmission || "أوتوماتيك",
+    horsepower: Number(c.horsepower) || 400,
+    exteriorColor: c.exterior_color || c.color || "أسود",
+    interiorColor: c.interior_color || "جلد فاخر",
+    color: c.exterior_color || c.color || "أسود",
+    condition: c.condition || "مستعمل بحالة ممتازة",
+    plateStatus: c.plate_status || "لوحات نظامية",
+    heroImage: primaryImg,
+    gallery: extractedImages,
+    images: extractedImages,
+    featured: Boolean(c.is_featured ?? c.isFeatured),
+    description: c.description || "",
+    specs: c.specs || {},
+  } as unknown) as Car;
 }
 
-export function generateMetadata({
+async function getCar(slug: string): Promise<Car | null> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+
+      // البحث بالـ slug
+      let { data: carData } = await supabase
+        .from("cars")
+        .select("*, car_images(*)")
+        .eq("slug", slug)
+        .maybeSingle();
+
+      // البحث بالـ id إذا كان الرابط يعتمد على معرف السيارة
+      if (!carData && slug.startsWith("car-")) {
+        const rawId = slug.replace("car-", "");
+        const { data: byId } = await supabase
+          .from("cars")
+          .select("*, car_images(*)")
+          .eq("id", rawId)
+          .maybeSingle();
+        carData = byId;
+      }
+
+      if (!carData) {
+        const { data: byRawId } = await supabase
+          .from("cars")
+          .select("*, car_images(*)")
+          .eq("id", slug)
+          .maybeSingle();
+        carData = byRawId;
+      }
+
+      if (carData) {
+        return formatCar(carData);
+      }
+    } catch (err) {
+      console.error("Supabase car fetch error:", err);
+    }
+  }
+
+  return getCarBySlug(slug) || null;
+}
+
+async function getRelatedCars(currentCar: Car): Promise<Car[]> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const { data } = await supabase
+        .from("cars")
+        .select("*, car_images(*)")
+        .neq("id", currentCar.id)
+        .limit(3);
+
+      if (data && data.length > 0) {
+        return data.map((c) => formatCar(c));
+      }
+    } catch {}
+  }
+
+  const related = CARS.filter((c) => c.brand === currentCar.brand && c.id !== currentCar.id).slice(0, 3);
+  return related.length > 0 ? related : CARS.filter((c) => c.id !== currentCar.id).slice(0, 3);
+}
+
+export async function generateMetadata({
   params,
 }: {
   params: { slug: string };
-}): Metadata {
-  const car = getCarBySlug(params.slug);
+}): Promise<Metadata> {
+  const car = await getCar(params.slug);
   if (!car) return {};
   return {
     title: `${car.brand} ${car.model} ${car.year} | أبيكس كارز`,
@@ -33,17 +173,16 @@ function getPageUrl(slug: string): string {
   return `${protocol}://${host}/car/${slug}`;
 }
 
-export default function CarDetailPage({
+export default async function CarDetailPage({
   params,
 }: {
   params: { slug: string };
 }) {
-  const car = getCarBySlug(params.slug);
+  const car = await getCar(params.slug);
   if (!car) notFound();
 
   const url = getPageUrl(car.slug);
-  const related = CARS.filter((c) => c.brand === car.brand && c.id !== car.id).slice(0, 3);
-  const fallbackRelated = related.length > 0 ? related : CARS.filter((c) => c.id !== car.id).slice(0, 3);
+  const fallbackRelated = await getRelatedCars(car);
 
   const specs = [
     { icon: Calendar, label: "سنة الصنع", value: `${car.year}` },
