@@ -23,7 +23,8 @@ export default function AdminLoginPage() {
       });
 
       if (error) {
-        setErrorMsg('بيانات الدخول غير صحيحة، يرجى التأكد والمحاولة مجدداً.');
+  setErrorMsg(error.message);
+}
       } else if (data.session) {
         router.push('/admin');
       }
