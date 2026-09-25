@@ -9,6 +9,8 @@ import { formatKm, formatUsd } from "@/lib/utils";
 import { SpecBadge } from "@/components/SpecBadge";
 
 export function CarCard({ car }: { car: Car }) {
+  const imgSrc = car.heroImage || (car.images && car.images[0]) || "https://picsum.photos/seed/apex-car/800/600";
+
   return (
     <motion.div
       layout
@@ -23,9 +25,10 @@ export function CarCard({ car }: { car: Car }) {
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-surface-2">
           <Image
-            src={car.heroImage}
+            src={imgSrc}
             alt={`${car.brand} ${car.model}`}
             fill
+            unoptimized
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
             className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
