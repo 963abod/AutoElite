@@ -137,21 +137,34 @@ async function getRelatedCars(currentCar: Car): Promise<Car[]> {
   if (supabaseUrl && supabaseKey) {
     try {
       const supabase = createClient(supabaseUrl, supabaseKey);
-      const { data } = await supabase
+      
+      // جلب سيارات حقيقية أخرى من Supabase باستثناء السيارة الحالية
+      let query = supabase
         .from("cars")
         .select("*, car_images(*)")
-        .neq("id", currentCar.id)
         .limit(3);
 
-      if (data && data.length > 0) {
-        return data.map((c) => formatCar(c));
+      // استبعاد السيارة الحالية إذا كانت تحمل معرف رقمي أو نصي
+      if (currentCar.id && !currentCar.id.includes(".")) {
+        query = query.neq("id", currentCar.id);
       }
-    } catch {}
+
+      const { data } = await query;
+
+      if (data && data.length > 0) {
+        return data
+          .filter((c: any) => c.slug !== currentCar.slug && c.id?.toString() !== currentCar.id?.toString())
+          .map((c) => formatCar(c));
+      }
+    } catch (err) {
+      console.error("Related cars fetch error:", err);
+    }
   }
 
-  const related = CARS.filter((c) => c.brand === currentCar.brand && c.id !== currentCar.id).slice(0, 3);
-  return related.length > 0 ? related : CARS.filter((c) => c.id !== currentCar.id).slice(0, 3);
+  // عدم استخدام أي بيانات قديمة كبديل إطلاقاً
+  return [];
 }
+
 
 export async function generateMetadata({
   params,
