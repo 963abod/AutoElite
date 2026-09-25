@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CARS, PRICE_BOUNDS as DEFAULT_PRICE_BOUNDS, YEAR_BOUNDS as DEFAULT_YEAR_BOUNDS } from "@/lib/data";
 import { FilterBar } from "@/components/FilterBar";
 import { CarGrid } from "@/components/CarGrid";
 import type { CarFilters, Car } from "@/types/car";
@@ -10,7 +9,7 @@ import { useSiteData } from "@/components/SiteProvider";
 export function CarsExplorer() {
   const { cars: dbCars } = useSiteData();
 
-  // تحويل وتجهيز سيارات Supabase واستخراج الصور بكافة مسمياتها
+  // تحويل وتجهيز سيارات Supabase واستخراج روابط الصور
   const formattedDbCars = useMemo<Car[]>(() => {
     if (!dbCars || dbCars.length === 0) return [];
 
@@ -25,7 +24,7 @@ export function CarsExplorer() {
         });
       }
 
-      // 2. فحص مصفوفة الصور إن وجدت
+      // 2. فحص مصفوفة الصور المباشرة
       if (Array.isArray(c.images)) {
         c.images.forEach((img: any) => {
           const url = typeof img === "string" ? img : img?.url || img?.image_url;
@@ -33,7 +32,7 @@ export function CarsExplorer() {
         });
       }
 
-      // 3. فحص كافة المسميات المباشرة لحقل الصورة
+      // 3. فحص كافة حقول الصور المفردة المحتملة
       const directFields = [
         c.main_image,
         c.image,
@@ -50,7 +49,6 @@ export function CarsExplorer() {
         }
       });
 
-      // إذا لم تتوفر أي صورة يتم استخدام صورة افتراضية
       if (extractedImages.length === 0) {
         extractedImages.push("https://picsum.photos/seed/apex-car/800/600");
       }
@@ -86,36 +84,14 @@ export function CarsExplorer() {
     });
   }, [dbCars]);
 
-  // دمج سيارات قاعدة البيانات في مقدمة القائمة
-  const allCars = useMemo(() => {
-    if (formattedDbCars.length === 0) return CARS;
-    return [
-      ...formattedDbCars,
-      ...CARS.filter(
-        (mc) => !formattedDbCars.some((dc) => dc.id === mc.id || dc.slug === mc.slug)
-      ),
-    ];
-  }, [formattedDbCars]);
-
-  const dynamicPriceBounds = useMemo<[number, number]>(() => {
-    if (allCars.length === 0) return DEFAULT_PRICE_BOUNDS;
-    const prices = allCars.map((c) => c.priceUsd).filter((p) => p > 0);
-    if (prices.length === 0) return DEFAULT_PRICE_BOUNDS;
-    return [Math.floor(Math.min(...prices) * 0.9), Math.ceil(Math.max(...prices) * 1.1)];
-  }, [allCars]);
-
-  const dynamicYearBounds = useMemo<[number, number]>(() => {
-    if (allCars.length === 0) return DEFAULT_YEAR_BOUNDS;
-    const years = allCars.map((c) => c.year).filter((y) => y > 0);
-    if (years.length === 0) return DEFAULT_YEAR_BOUNDS;
-    return [Math.min(...years), Math.max(...years)];
-  }, [allCars]);
+  // عرض سياراتك الحقيقية فقط
+  const allCars = formattedDbCars;
 
   const [filters, setFilters] = useState<CarFilters>({
     brands: [],
     fuelTypes: [],
-    yearRange: [2010, 2030],
-    priceRange: [0, 20000000],
+    yearRange: [2000, 2030],
+    priceRange: [0, 100000000],
   });
 
   const filteredCars = useMemo(() => {
@@ -139,7 +115,7 @@ export function CarsExplorer() {
         return false;
       }
       if (
-        filters.priceRange[1] < 20000000 &&
+        filters.priceRange[1] < 100000000 &&
         car.priceUsd > filters.priceRange[1]
       ) {
         return false;
@@ -148,18 +124,12 @@ export function CarsExplorer() {
     });
   }, [allCars, filters]);
 
-  const activeCount =
-    filters.brands.length +
-    filters.fuelTypes.length +
-    (filters.yearRange[0] !== dynamicYearBounds[0] || filters.yearRange[1] !== dynamicYearBounds[1] ? 1 : 0) +
-    (filters.priceRange[0] !== dynamicPriceBounds[0] || filters.priceRange[1] !== dynamicPriceBounds[1] ? 1 : 0);
-
   function resetFilters() {
     setFilters({
       brands: [],
       fuelTypes: [],
-      yearRange: dynamicYearBounds,
-      priceRange: dynamicPriceBounds,
+      yearRange: [2000, 2030],
+      priceRange: [0, 100000000],
     });
   }
 
@@ -168,7 +138,7 @@ export function CarsExplorer() {
       <FilterBar
         filters={filters}
         onChange={setFilters}
-        activeCount={activeCount}
+        activeCount={0}
         onReset={resetFilters}
       />
 
