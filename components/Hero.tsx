@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
+import { useSiteData } from "@/components/SiteProvider";
 
 const container = {
   hidden: {},
@@ -21,6 +22,25 @@ const item = {
 };
 
 export function Hero() {
+  const { sections, heroImages, cars } = useSiteData();
+
+  // جلب نصوص قسم الهيرو من الـ CMS أو استخدام النصوص الافتراضية كاحتياط
+  const heroSection = sections?.hero || sections?.['hero_section'];
+  const badgeText = heroSection?.subtitle || "معرض سيارات فاخرة — دمشق";
+  const mainTitle = heroSection?.title || "قمة الفخامة والسيارات\nالحديثة في سورية";
+  const description =
+    heroSection?.content ||
+    "نوفر لكم تشكيلة مختارة من أرقى السيارات الفاخرة، مفحوصة بعناية ومضمونة الحالة، مع تجربة معاينة واقتناء تليق بتوقعاتكم.";
+
+  // جلب أول صورة هيرو مرفوعة في لوحة التحكم، أو الصورة الافتراضية
+  const heroImgUrl =
+    heroImages && heroImages.length > 0 && heroImages[0]?.image_url
+      ? heroImages[0].image_url
+      : "https://picsum.photos/seed/apexcars-hero/1400/1050";
+
+  // حساب عدد السيارات الفعلي من لوحة التحكم
+  const carCount = cars && cars.length > 0 ? cars.length : 10;
+
   return (
     <section className="relative overflow-hidden border-b border-line bg-surface">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:py-24">
@@ -34,24 +54,21 @@ export function Hero() {
             variants={item}
             className="mb-5 text-sm font-medium text-champagne-deep"
           >
-            معرض سيارات فاخرة — دمشق
+            {badgeText}
           </motion.p>
 
           <motion.h1
             variants={item}
-            className="text-4xl font-bold leading-[1.15] sm:text-5xl lg:text-[3.3rem]"
+            className="text-4xl font-bold leading-[1.15] sm:text-5xl lg:text-[3.3rem] whitespace-pre-line"
           >
-            قمة الفخامة والسيارات
-            <br />
-            الحديثة في سورية
+            {mainTitle}
           </motion.h1>
 
           <motion.p
             variants={item}
-            className="mt-6 max-w-md text-base leading-8 text-ink-soft"
+            className="mt-6 max-w-md text-base leading-8 text-ink-soft whitespace-pre-line"
           >
-            نوفر لكم تشكيلة مختارة من أرقى السيارات الفاخرة، مفحوصة بعناية
-            ومضمونة الحالة، مع تجربة معاينة واقتناء تليق بتوقعاتكم.
+            {description}
           </motion.p>
 
           <motion.div variants={item} className="mt-9 flex items-center gap-4">
@@ -66,7 +83,7 @@ export function Hero() {
               />
             </a>
             <span className="text-sm text-ink-soft">
-              {`+${10}`} سيارة متوفرة حالياً
+              {`+${carCount}`} سيارة متوفرة حالياً
             </span>
           </motion.div>
         </motion.div>
@@ -78,10 +95,11 @@ export function Hero() {
           className="relative aspect-[4/3] overflow-hidden rounded-xl2 border border-line shadow-ambient-lg lg:-ms-6"
         >
           <Image
-            src="https://picsum.photos/seed/apexcars-hero/1400/1050"
+            src={heroImgUrl}
             alt="سيارة فاخرة معروضة في أبيكس كارز"
             fill
             priority
+            unoptimized
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover"
           />
