@@ -10,28 +10,52 @@ import { useSiteData } from "@/components/SiteProvider";
 export function CarsExplorer() {
   const { cars: dbCars } = useSiteData();
 
-  // تحويل وتجهيز سيارات Supabase
+  // تحويل وتجهيز سيارات Supabase واستخراج الصور بكافة مسمياتها
   const formattedDbCars = useMemo<Car[]>(() => {
     if (!dbCars || dbCars.length === 0) return [];
 
     return dbCars.map((c: any) => {
-      const imgs: string[] = [];
+      const extractedImages: string[] = [];
+
+      // 1. فحص جدول صور السيارات الفرعي
       if (Array.isArray(c.car_images) && c.car_images.length > 0) {
-        const sorted = [...c.car_images].sort(
-          (a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0)
-        );
-        sorted.forEach((img: any) => {
-          if (img.image_url) imgs.push(img.image_url);
+        c.car_images.forEach((img: any) => {
+          const url = typeof img === "string" ? img : img?.image_url || img?.url || img?.image;
+          if (url && !extractedImages.includes(url)) extractedImages.push(url);
         });
       }
-      if (c.image_url && !imgs.includes(c.image_url)) {
-        imgs.unshift(c.image_url);
-      }
-      if (imgs.length === 0) {
-        imgs.push("https://picsum.photos/seed/apex-car/800/600");
+
+      // 2. فحص مصفوفة الصور إن وجدت
+      if (Array.isArray(c.images)) {
+        c.images.forEach((img: any) => {
+          const url = typeof img === "string" ? img : img?.url || img?.image_url;
+          if (url && !extractedImages.includes(url)) extractedImages.push(url);
+        });
       }
 
-      const primaryImg = imgs[0];
+      // 3. فحص كافة المسميات المباشرة لحقل الصورة
+      const directFields = [
+        c.main_image,
+        c.image,
+        c.image_url,
+        c.cover_image,
+        c.thumbnail,
+        c.photo,
+        c.photo_url,
+      ];
+
+      directFields.forEach((field) => {
+        if (field && typeof field === "string" && !extractedImages.includes(field)) {
+          extractedImages.unshift(field);
+        }
+      });
+
+      // إذا لم تتوفر أي صورة يتم استخدام صورة افتراضية
+      if (extractedImages.length === 0) {
+        extractedImages.push("https://picsum.photos/seed/apex-car/800/600");
+      }
+
+      const primaryImg = extractedImages[0];
       const price = Number(c.price_usd ?? c.price ?? c.priceUsd ?? 0);
       const year = Number(c.year) || 2024;
 
@@ -53,8 +77,8 @@ export function CarsExplorer() {
         condition: c.condition || "مستعمل بحالة ممتازة",
         plateStatus: c.plate_status || "لوحات نظامية",
         heroImage: primaryImg,
-        gallery: imgs,
-        images: imgs,
+        gallery: extractedImages,
+        images: extractedImages,
         featured: Boolean(c.is_featured ?? c.isFeatured),
         description: c.description || "",
         specs: c.specs || {},
@@ -73,7 +97,6 @@ export function CarsExplorer() {
     ];
   }, [formattedDbCars]);
 
-  // حساب الحدود الديناميكية للأسعار والسنوات لتشمل سيارات اللوحة
   const dynamicPriceBounds = useMemo<[number, number]>(() => {
     if (allCars.length === 0) return DEFAULT_PRICE_BOUNDS;
     const prices = allCars.map((c) => c.priceUsd).filter((p) => p > 0);
@@ -92,7 +115,7 @@ export function CarsExplorer() {
     brands: [],
     fuelTypes: [],
     yearRange: [2010, 2030],
-    priceRange: [0, 2000000],
+    priceRange: [0, 20000000],
   });
 
   const filteredCars = useMemo(() => {
@@ -116,7 +139,7 @@ export function CarsExplorer() {
         return false;
       }
       if (
-        filters.priceRange[1] < 2000000 &&
+        filters.priceRange[1] < 20000000 &&
         car.priceUsd > filters.priceRange[1]
       ) {
         return false;
