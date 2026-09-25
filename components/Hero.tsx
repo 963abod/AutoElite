@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { useSiteData } from "@/components/SiteProvider";
+import { useEffect, useState } from "react";
 
 const container = {
   hidden: {},
@@ -24,22 +25,49 @@ const item = {
 export function Hero() {
   const { sections, heroImages, cars } = useSiteData();
 
-  // جلب نصوص قسم الهيرو من الـ CMS أو استخدام النصوص الافتراضية كاحتياط
-  const heroSection = sections?.hero || sections?.['hero_section'];
+  // ذاكرة فورية لحفظ واسترجاع صورة المعرض وعدد السيارات فوراً عند عمل Refresh
+  const [cachedImg, setCachedImg] = useState<string>("");
+  const [cachedCount, setCachedCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const savedImg = localStorage.getItem("apex_cached_hero");
+    if (savedImg) setCachedImg(savedImg);
+
+    const savedCount = localStorage.getItem("apex_cached_car_count");
+    if (savedCount) setCachedCount(Number(savedCount));
+  }, []);
+
+  useEffect(() => {
+    if (heroImages && heroImages.length > 0 && heroImages[0]?.image_url) {
+      setCachedImg(heroImages[0].image_url);
+      localStorage.setItem("apex_cached_hero", heroImages[0].image_url);
+    }
+  }, [heroImages]);
+
+  useEffect(() => {
+    if (cars && Array.isArray(cars) && cars.length > 0) {
+      setCachedCount(cars.length);
+      localStorage.setItem("apex_cached_car_count", cars.length.toString());
+    }
+  }, [cars]);
+
+  // نصوص قسم الهيرو
+  const heroSection = sections?.hero || sections?.["hero_section"];
   const badgeText = heroSection?.subtitle || "معرض سيارات فاخرة — دمشق";
   const mainTitle = heroSection?.title || "قمة الفخامة والسيارات\nالحديثة في سورية";
   const description =
     heroSection?.content ||
     "نوفر لكم تشكيلة مختارة من أرقى السيارات الفاخرة، مفحوصة بعناية ومضمونة الحالة، مع تجربة معاينة واقتناء تليق بتوقعاتكم.";
 
-  // جلب أول صورة هيرو مرفوعة في لوحة التحكم، أو الصورة الافتراضية
-  const heroImgUrl =
-    heroImages && heroImages.length > 0 && heroImages[0]?.image_url
-      ? heroImages[0].image_url
-      : "https://picsum.photos/seed/apexcars-hero/1400/1050";
+  // استخدام الصورة الجديدة المرفوعة أو المخزنة محلياً، وحذف صورة البحر القديمة نهائياً
+  const activeHeroImg =
+    (heroImages && heroImages.length > 0 && heroImages[0]?.image_url) ||
+    cachedImg;
 
-  // حساب عدد السيارات الفعلي من لوحة التحكم
-  const carCount = cars && cars.length > 0 ? cars.length : 10;
+  const displayCount =
+    (cars && cars.length > 0 ? cars.length : null) ??
+    cachedCount ??
+    null;
 
   return (
     <section className="relative overflow-hidden border-b border-line bg-surface">
@@ -82,27 +110,33 @@ export function Hero() {
                 strokeWidth={1.5}
               />
             </a>
-            <span className="text-sm text-ink-soft">
-              {`+${carCount}`} سيارة متوفرة حالياً
-            </span>
+            {displayCount !== null && (
+              <span className="text-sm text-ink-soft">
+                {`+${displayCount}`} سيارة متوفرة حالياً
+              </span>
+            )}
           </motion.div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="relative aspect-[4/3] overflow-hidden rounded-xl2 border border-line shadow-ambient-lg lg:-ms-6"
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="relative aspect-[4/3] overflow-hidden rounded-xl2 border border-line bg-surface-2 shadow-ambient-lg lg:-ms-6"
         >
-          <Image
-            src={heroImgUrl}
-            alt="سيارة فاخرة معروضة في أبيكس كارز"
-            fill
-            priority
-            unoptimized
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover"
-          />
+          {activeHeroImg ? (
+            <Image
+              src={activeHeroImg}
+              alt="معرض أبيكس كارز"
+              fill
+              priority
+              unoptimized
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+            />
+          ) : (
+            <div className="h-full w-full animate-pulse bg-surface-2" />
+          )}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/15 via-transparent to-transparent" />
         </motion.div>
       </div>
