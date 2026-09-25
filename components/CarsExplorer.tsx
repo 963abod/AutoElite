@@ -1,24 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CARS, PRICE_BOUNDS, YEAR_BOUNDS } from "@/lib/data";
+import { CARS, PRICE_BOUNDS as DEFAULT_PRICE_BOUNDS, YEAR_BOUNDS as DEFAULT_YEAR_BOUNDS } from "@/lib/data";
 import { FilterBar } from "@/components/FilterBar";
 import { CarGrid } from "@/components/CarGrid";
 import type { CarFilters, Car } from "@/types/car";
 import { useSiteData } from "@/components/SiteProvider";
 
-const DEFAULT_FILTERS: CarFilters = {
-  brands: [],
-  fuelTypes: [],
-  yearRange: YEAR_BOUNDS,
-  priceRange: PRICE_BOUNDS,
-};
-
 export function CarsExplorer() {
   const { cars: dbCars } = useSiteData();
-  const [filters, setFilters] = useState<CarFilters>(DEFAULT_FILTERS);
 
-  // تحويل وتجهيز سيارات Supabase مع ملء كافة خصائص Car المطلوبة
+  // تحويل وتجهيز سيارات Supabase
   const formattedDbCars = useMemo<Car[]>(() => {
     if (!dbCars || dbCars.length === 0) return [];
 
@@ -40,6 +32,8 @@ export function CarsExplorer() {
       }
 
       const primaryImg = imgs[0];
+      const price = Number(c.price_usd ?? c.price ?? c.priceUsd ?? 0);
+      const year = Number(c.year) || 2024;
 
       return ({
         id: c.id?.toString() || Math.random().toString(),
@@ -47,17 +41,17 @@ export function CarsExplorer() {
         name: c.name || `${c.brand || ""} ${c.model || ""}`.trim() || "سيارة فاخرة",
         brand: c.brand || "أخرى",
         model: c.model || "",
-        year: Number(c.year) || 2024,
-        priceUsd: Number(c.price_usd ?? c.priceUsd ?? 0),
-        mileageKm: Number(c.mileage_km ?? c.mileageKm ?? 0),
+        year: year,
+        priceUsd: price,
+        mileageKm: Number(c.mileage_km ?? c.mileage ?? c.mileageKm ?? 0),
         fuelType: c.fuel_type || c.fuelType || "بنزين",
         transmission: c.transmission || "أوتوماتيك",
         horsepower: Number(c.horsepower) || 400,
-        exteriorColor: c.exterior_color || c.exteriorColor || c.color || "أسود",
-        interiorColor: c.interior_color || c.interiorColor || "جلد فاخر",
+        exteriorColor: c.exterior_color || c.color || "أسود",
+        interiorColor: c.interior_color || "جلد فاخر",
         color: c.exterior_color || c.color || "أسود",
         condition: c.condition || "مستعمل بحالة ممتازة",
-        plateStatus: c.plate_status || c.plateStatus || "لوحات نظامية",
+        plateStatus: c.plate_status || "لوحات نظامية",
         heroImage: primaryImg,
         gallery: imgs,
         images: imgs,
@@ -79,6 +73,28 @@ export function CarsExplorer() {
     ];
   }, [formattedDbCars]);
 
+  // حساب الحدود الديناميكية للأسعار والسنوات لتشمل سيارات اللوحة
+  const dynamicPriceBounds = useMemo<[number, number]>(() => {
+    if (allCars.length === 0) return DEFAULT_PRICE_BOUNDS;
+    const prices = allCars.map((c) => c.priceUsd).filter((p) => p > 0);
+    if (prices.length === 0) return DEFAULT_PRICE_BOUNDS;
+    return [Math.floor(Math.min(...prices) * 0.9), Math.ceil(Math.max(...prices) * 1.1)];
+  }, [allCars]);
+
+  const dynamicYearBounds = useMemo<[number, number]>(() => {
+    if (allCars.length === 0) return DEFAULT_YEAR_BOUNDS;
+    const years = allCars.map((c) => c.year).filter((y) => y > 0);
+    if (years.length === 0) return DEFAULT_YEAR_BOUNDS;
+    return [Math.min(...years), Math.max(...years)];
+  }, [allCars]);
+
+  const [filters, setFilters] = useState<CarFilters>({
+    brands: [],
+    fuelTypes: [],
+    yearRange: [2010, 2030],
+    priceRange: [0, 2000000],
+  });
+
   const filteredCars = useMemo(() => {
     return allCars.filter((car) => {
       if (filters.brands.length > 0 && !filters.brands.includes(car.brand)) {
@@ -94,7 +110,13 @@ export function CarsExplorer() {
         return false;
       }
       if (
-        car.priceUsd < filters.priceRange[0] ||
+        filters.priceRange[0] > 0 &&
+        car.priceUsd < filters.priceRange[0]
+      ) {
+        return false;
+      }
+      if (
+        filters.priceRange[1] < 2000000 &&
         car.priceUsd > filters.priceRange[1]
       ) {
         return false;
@@ -106,11 +128,16 @@ export function CarsExplorer() {
   const activeCount =
     filters.brands.length +
     filters.fuelTypes.length +
-    (filters.yearRange[0] !== YEAR_BOUNDS[0] || filters.yearRange[1] !== YEAR_BOUNDS[1] ? 1 : 0) +
-    (filters.priceRange[0] !== PRICE_BOUNDS[0] || filters.priceRange[1] !== PRICE_BOUNDS[1] ? 1 : 0);
+    (filters.yearRange[0] !== dynamicYearBounds[0] || filters.yearRange[1] !== dynamicYearBounds[1] ? 1 : 0) +
+    (filters.priceRange[0] !== dynamicPriceBounds[0] || filters.priceRange[1] !== dynamicPriceBounds[1] ? 1 : 0);
 
   function resetFilters() {
-    setFilters(DEFAULT_FILTERS);
+    setFilters({
+      brands: [],
+      fuelTypes: [],
+      yearRange: dynamicYearBounds,
+      priceRange: dynamicPriceBounds,
+    });
   }
 
   return (
