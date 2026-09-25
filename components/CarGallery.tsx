@@ -1,22 +1,37 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { CarAngleImage } from "@/types/car";
 
 export function CarGallery({
   images,
   carName,
 }: {
-  images: CarAngleImage[];
+  images: any[];
   carName: string;
 }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, direction: "rtl" });
   const [selected, setSelected] = useState(0);
+
+  // توحيد صيغة الصور سواء كانت نصوصاً مباشرة أو كائنات
+  const formattedImages = useMemo(() => {
+    if (!Array.isArray(images) || images.length === 0) {
+      return [{ url: "https://picsum.photos/seed/apex-car/800/600", label: "صورة السيارة" }];
+    }
+    return images.map((img: any, idx: number) => {
+      if (typeof img === "string") {
+        return { url: img, label: `صورة ${idx + 1}` };
+      }
+      return {
+        url: img?.url || img?.image_url || img?.image || "https://picsum.photos/seed/apex-car/800/600",
+        label: img?.label || `صورة ${idx + 1}`,
+      };
+    });
+  }, [images]);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -40,13 +55,14 @@ export function CarGallery({
       <div className="relative overflow-hidden rounded-xl2 border border-line bg-surface-2 shadow-card">
         <div className="embla" ref={emblaRef}>
           <div className="embla__container">
-            {images.map((img, i) => (
+            {formattedImages.map((img, i) => (
               <div className="embla__slide" key={i}>
                 <div className="relative aspect-[4/3] w-full">
                   <Image
                     src={img.url}
                     alt={`${carName} — ${img.label}`}
                     fill
+                    unoptimized
                     sizes="(max-width: 1024px) 100vw, 60vw"
                     className="object-cover"
                     priority={i === 0}
@@ -76,20 +92,20 @@ export function CarGallery({
 
         <AnimatePresence mode="wait">
           <motion.span
-            key={images[selected]?.label}
+            key={formattedImages[selected]?.label || selected}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.25 }}
             className="absolute bottom-3 right-3 rounded-full bg-canvas/90 px-3.5 py-1.5 text-xs font-medium shadow-card"
           >
-            {images[selected]?.label}
+            {formattedImages[selected]?.label}
           </motion.span>
         </AnimatePresence>
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-6">
-        {images.map((img, i) => (
+        {formattedImages.map((img, i) => (
           <button
             key={i}
             type="button"
@@ -105,6 +121,7 @@ export function CarGallery({
               src={img.url}
               alt={img.label}
               fill
+              unoptimized
               sizes="120px"
               className="object-cover"
             />
