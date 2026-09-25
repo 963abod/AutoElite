@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { CARS, PRICE_BOUNDS, YEAR_BOUNDS } from "@/lib/data";
 import { FilterBar } from "@/components/FilterBar";
 import { CarGrid } from "@/components/CarGrid";
-import type { CarFilters } from "@/types/car";
+import type { CarFilters, Car } from "@/types/car";
+import { useSiteData } from "@/components/SiteProvider";
 
 const DEFAULT_FILTERS: CarFilters = {
   brands: [],
@@ -14,10 +15,65 @@ const DEFAULT_FILTERS: CarFilters = {
 };
 
 export function CarsExplorer() {
+  const { cars: dbCars } = useSiteData();
   const [filters, setFilters] = useState<CarFilters>(DEFAULT_FILTERS);
 
+  // تحويل وتهيئة سيارات Supabase لتتوافق مع نظام المعرض والفلاتر
+  const formattedDbCars = useMemo<Car[]>(() => {
+    if (!dbCars || dbCars.length === 0) return [];
+
+    return dbCars.map((c: any) => {
+      const imgs: string[] = [];
+      if (Array.isArray(c.car_images) && c.car_images.length > 0) {
+        const sorted = [...c.car_images].sort(
+          (a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0)
+        );
+        sorted.forEach((img: any) => {
+          if (img.image_url) imgs.push(img.image_url);
+        });
+      }
+      if (c.image_url && !imgs.includes(c.image_url)) {
+        imgs.unshift(c.image_url);
+      }
+      if (imgs.length === 0) {
+        imgs.push("https://picsum.photos/seed/apex-car/800/600");
+      }
+
+      return {
+        id: c.id?.toString() || Math.random().toString(),
+        slug: c.slug || `car-${c.id}`,
+        name: c.name || `${c.brand || ""} ${c.model || ""}`.trim() || "سيارة فاخرة",
+        brand: c.brand || "أخرى",
+        model: c.model || "",
+        year: Number(c.year) || 2024,
+        priceUsd: Number(c.price_usd ?? c.priceUsd ?? 0),
+        mileageKm: Number(c.mileage_km ?? c.mileageKm ?? 0),
+        fuelType: c.fuel_type || c.fuelType || "بنزين",
+        transmission: c.transmission || "أوتوماتيك",
+        horsepower: Number(c.horsepower) || 400,
+        exteriorColor: c.exterior_color || c.exteriorColor || "أسود",
+        interiorColor: c.interior_color || c.interiorColor || "جلد فاخر",
+        images: imgs,
+        featured: Boolean(c.is_featured ?? c.isFeatured),
+        description: c.description || "",
+        specs: c.specs || {},
+      } as Car;
+    });
+  }, [dbCars]);
+
+  // وضع السيارات المضافة من اللوحة في أول القائمة
+  const allCars = useMemo(() => {
+    if (formattedDbCars.length === 0) return CARS;
+    return [
+      ...formattedDbCars,
+      ...CARS.filter(
+        (mc) => !formattedDbCars.some((dc) => dc.id === mc.id || dc.slug === mc.slug)
+      ),
+    ];
+  }, [formattedDbCars]);
+
   const filteredCars = useMemo(() => {
-    return CARS.filter((car) => {
+    return allCars.filter((car) => {
       if (filters.brands.length > 0 && !filters.brands.includes(car.brand)) {
         return false;
       }
@@ -38,7 +94,7 @@ export function CarsExplorer() {
       }
       return true;
     });
-  }, [filters]);
+  }, [allCars, filters]);
 
   const activeCount =
     filters.brands.length +
@@ -63,7 +119,7 @@ export function CarsExplorer() {
         <div className="mb-6 flex items-baseline justify-between">
           <h2 className="text-xl font-semibold">السيارات المعروضة</h2>
           <p className="text-sm text-ink-soft">
-            {filteredCars.length} من {CARS.length} سيارة
+            {filteredCars.length} من {allCars.length} سيارة
           </p>
         </div>
 
