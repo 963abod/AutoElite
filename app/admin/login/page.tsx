@@ -18,18 +18,17 @@ export default function AdminLoginPage() {
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       });
 
       if (error) {
-  setErrorMsg(error.message);
-}
+        setErrorMsg(error.message);
       } else if (data.session) {
         router.push('/admin');
       }
     } catch (err: any) {
-      setErrorMsg('حدث خطأ غير متوقع أثناء محاولة الدخول.');
+      setErrorMsg(err.message || 'حدث خطأ غير متوقع أثناء محاولة الدخول.');
     } finally {
       setLoading(false);
     }
@@ -86,4 +85,4 @@ export default function AdminLoginPage() {
       </div>
     </div>
   );
-            }
+}
