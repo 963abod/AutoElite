@@ -18,7 +18,7 @@ export function CarsExplorer() {
   const { cars: dbCars } = useSiteData();
   const [filters, setFilters] = useState<CarFilters>(DEFAULT_FILTERS);
 
-  // تحويل وتهيئة سيارات Supabase لتتوافق مع نظام المعرض والفلاتر
+  // تحويل وتجهيز سيارات Supabase مع ملء كافة خصائص Car المطلوبة
   const formattedDbCars = useMemo<Car[]>(() => {
     if (!dbCars || dbCars.length === 0) return [];
 
@@ -39,7 +39,9 @@ export function CarsExplorer() {
         imgs.push("https://picsum.photos/seed/apex-car/800/600");
       }
 
-      return {
+      const primaryImg = imgs[0];
+
+      return ({
         id: c.id?.toString() || Math.random().toString(),
         slug: c.slug || `car-${c.id}`,
         name: c.name || `${c.brand || ""} ${c.model || ""}`.trim() || "سيارة فاخرة",
@@ -51,17 +53,22 @@ export function CarsExplorer() {
         fuelType: c.fuel_type || c.fuelType || "بنزين",
         transmission: c.transmission || "أوتوماتيك",
         horsepower: Number(c.horsepower) || 400,
-        exteriorColor: c.exterior_color || c.exteriorColor || "أسود",
+        exteriorColor: c.exterior_color || c.exteriorColor || c.color || "أسود",
         interiorColor: c.interior_color || c.interiorColor || "جلد فاخر",
+        color: c.exterior_color || c.color || "أسود",
+        condition: c.condition || "مستعمل بحالة ممتازة",
+        plateStatus: c.plate_status || c.plateStatus || "لوحات نظامية",
+        heroImage: primaryImg,
+        gallery: imgs,
         images: imgs,
         featured: Boolean(c.is_featured ?? c.isFeatured),
         description: c.description || "",
         specs: c.specs || {},
-      } as Car;
+      } as unknown) as Car;
     });
   }, [dbCars]);
 
-  // وضع السيارات المضافة من اللوحة في أول القائمة
+  // دمج سيارات قاعدة البيانات في مقدمة القائمة
   const allCars = useMemo(() => {
     if (formattedDbCars.length === 0) return CARS;
     return [
