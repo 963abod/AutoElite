@@ -2,7 +2,7 @@ import type { Car } from "@/types/car";
 import { formatKm, formatUsd } from "@/lib/utils";
 
 // TODO: استبدل هذا الرقم برقم واتساب المعرض الفعلي (بصيغة دولية بدون + أو أصفار)
-export const SHOWROOM_WHATSAPP_NUMBER = "963991234567";
+export const SHOWROOM_WHATSAPP_NUMBER = "963951708141";
 
 export function buildCarInquiryMessage(car: Car, url: string): string {
   const carName = `${car.brand} ${car.model} ${car.year}`;
